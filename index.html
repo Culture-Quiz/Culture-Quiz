@@ -3408,8 +3408,60 @@ function renderBadges() {
   // Conserver le dernier élément (le <p> italique) et le bouton reset si présent
   const resetBtn = screen.querySelector(".badges-reset-btn");
   const italicP  = screen.querySelector("p[style*='italic']");
-  screen.innerHTML = "";
+  screen.innerHTML += `
+    <div style="text-align:center;padding-bottom:28px;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px;font-style:italic;">
+        Jouez pour débloquer tous les badges ! 🚀
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="resetHistoryOnly()" style="
+          background:none;border:2px solid var(--text-muted);color:var(--text-muted);
+          border-radius:10px;padding:10px 18px;font-size:0.85rem;font-weight:700;
+          cursor:pointer;font-family:var(--font-body);transition:all 0.2s ease;
+        " onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--text-muted)';this.style.color='var(--text-muted)'">
+          🗑️ Effacer l'historique
+        </button>
+        <button onclick="resetBadgesOnly()" style="
+          background:none;border:2px solid var(--text-muted);color:var(--text-muted);
+          border-radius:10px;padding:10px 18px;font-size:0.85rem;font-weight:700;
+          cursor:pointer;font-family:var(--font-body);transition:all 0.2s ease;
+        " onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--text-muted)';this.style.color='var(--text-muted)'">
+          🎖️ Réinitialiser les badges
+        </button>
+        <button onclick="resetAllData()" style="
+          background:none;border:2px solid var(--error);color:var(--error);
+          border-radius:10px;padding:10px 18px;font-size:0.85rem;font-weight:700;
+          cursor:pointer;font-family:var(--font-body);transition:all 0.2s ease;
+        " onmouseover="this.style.background='var(--error-light)'" 
+           onmouseout="this.style.background='none'">
+          ⚠️ Tout réinitialiser
+        </button>
+      </div>
+    </div>
+  `;
 
+  function resetBadgesOnly() {
+  if (!confirm("⚠️ Supprimer tous les badges débloqués ?\n\nVotre historique et votre record seront conservés.")) return;
+  const data = loadAppData();
+  data.badges = {};
+  data.categoryCorrect = {};
+  saveAppData(data);
+  renderBadges();
+  showToast("✅ Badges réinitialisés.");
+}
+
+function resetHistoryOnly() {
+  if (!confirm("⚠️ Effacer tout l'historique des scores ?\n\nVos badges et votre record seront conservés.")) return;
+  const data = loadAppData();
+  data.history = [];
+  saveAppData(data);
+  renderHistory();
+  showToast("✅ Historique effacé.");
+}
+  
+  
   // En-tête
   screen.innerHTML = `
     <div style="text-align:center;margin-bottom:36px;">
@@ -3452,7 +3504,9 @@ function renderBadges() {
         <span class="badge-icon">${isUnlocked ? badge.icon : "🔒"}</span>
         <span class="badge-name">${badge.name}</span>
         <span class="badge-desc">${badge.desc}</span>
-        ${isUnlocked ? `<span style="font-size:0.7rem;color:var(--success);font-weight:600;margin-top:2px;">✓ Débloqué le ${unlockedBadges[badge.id].unlockedAt}</span>` : ""}
+        ${isUnlocked ? `<span style="font-size:0.7rem;color:var(--success);font-weight:600;margin-top:2px;">✓ Débloqué le ${unlockedBadges[badge.id].unlockedAt}
+		
+		</span>` : ""}
       `;
       if (isUnlocked) {
         card.style.animation = "none";
@@ -3469,6 +3523,8 @@ function renderBadges() {
     Jouez pour débloquer tous les badges ! 🚀
   </p>`;
 }
+
+
 
 /* Lancement */
 init();
