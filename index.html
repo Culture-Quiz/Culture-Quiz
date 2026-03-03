@@ -1663,6 +1663,10 @@ body { padding-top: 78px; }
   margin-right: auto;
 }
 
+#app-layout.centered {
+  justify-content: center;
+}
+
 </style>
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2750,11 +2754,17 @@ function showScreen(id) {
   document.getElementById(id).classList.add("active");
 
   const isHome = id === "screen-home";
-  const isFullPage = id === "screen-themes" || id === "screen-badges" || id === "screen-revision";
+  const isCentered = ["screen-themes", "screen-badges", "screen-revision"].includes(id);
 
   document.getElementById("sidebar").style.display = isHome ? "" : "none";
   document.getElementById("challenge-sidebar").style.display = isHome ? "" : "none";
-  document.getElementById("app-layout").style.justifyContent = isFullPage ? "center" : "";
+
+  const layout = document.getElementById("app-layout");
+  if (isCentered) {
+    layout.classList.add("centered");
+  } else {
+    layout.classList.remove("centered");
+  }
 }
 
 /* =====================================================
@@ -3190,7 +3200,6 @@ function navTo(page) {
     showScreen("screen-themes");
     document.getElementById("sidebar").style.display = "none";
     document.getElementById("challenge-sidebar").style.display = "none";
-    document.getElementById("app-layout").style.justifyContent = "center";
   } else if (page === "badges") {
     showScreen("screen-badges");
     document.getElementById("sidebar").style.display = "none";
