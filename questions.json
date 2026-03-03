@@ -16,6 +16,33 @@
   { "theme": "Histoire", "difficulty": "Difficile", "question": "En quelle année fut signée la Magna Carta ?", "answers": ["1215", "1066", "1189", "1265"], "correct": 0, "explanation": "La Magna Carta fut signée par le roi Jean d'Angleterre en 1215, limitant le pouvoir royal face aux barons." },
   { "theme": "Histoire", "difficulty": "Difficile", "question": "Quel général carthaginois traversa les Alpes avec des éléphants ?", "answers": ["Hasdrubal", "Hamilcar", "Hannibal Barca", "Maharbal"], "correct": 2, "explanation": "Hannibal Barca traversa les Alpes en 218 av. J.-C. avec ses troupes et ses éléphants pour attaquer Rome par le nord." },
   { "theme": "Histoire", "difficulty": "Difficile", "question": "Quelle révolution industrielle s'est d'abord développée au Royaume-Uni au XVIIIe siècle autour de quelle invention clé ?", "answers": ["Le métier à tisser Jacquard", "L'imprimerie de Gutenberg", "La machine à vapeur de James Watt", "La dynamo électrique"], "correct": 2, "explanation": "La machine à vapeur perfectionnée par James Watt (brevet 1769) fut le moteur de la première révolution industrielle britannique." },
+  { "theme": "Histoire", "difficulty": "Facile", "question": "Quelle civilisation a construit le Parthénon ?", "answers": ["Les Perses","Les Grecs","Les Égyptiens","Les Romains"], "correct": 1, "explanation": "Le Parthénon est construit au Ve siècle av. J.-C. à Athènes." },
+{ "theme": "Histoire", "difficulty": "Facile", "question": "Quelle guerre oppose Nord et Sud aux États-Unis au XIXe siècle ?", "answers": ["Guerre hispano-américaine","Guerre froide","Guerre d’indépendance","Guerre de Sécession"], "correct": 3, "explanation": "De 1861 à 1865, elle oppose les États esclavagistes du Sud aux États du Nord." },
+{ "theme": "Histoire", "difficulty": "Facile", "question": "Quelle épidémie ravage l’Europe au XIVe siècle ?", "answers": ["Peste noire","Variole","Typhus","Choléra"], "correct": 0, "explanation": "Elle tue environ un tiers de la population européenne entre 1347 et 1352." },
+{ "theme": "Histoire", "difficulty": "Moyen", "question": "Qui dirige l’URSS pendant la Seconde Guerre mondiale ?", "answers": ["Lénine","Khrouchtchev","Trotski","Staline"], "correct": 3, "explanation": "Joseph Staline gouverne l’URSS de 1924 à 1953." },
+{ "theme": "Histoire", "difficulty": "Moyen", "question": "Quelle dynastie règne sur la France avant la Révolution ?", "answers": ["Les Bourbons","Les Carolingiens","Les Capétiens","Les Mérovingiens"], "correct": 0, "explanation": "Les Bourbons règnent depuis Henri IV jusqu’à la Révolution." },
+{ "theme": "Histoire", "difficulty": "Facile", "question": "En quelle année débute la Première Guerre mondiale ?", "answers": ["1914","1918","1916","1912"], "correct": 0, "explanation": "L’assassinat de l’archiduc François-Ferdinand déclenche le conflit." },
+{ "theme": "Histoire", "difficulty": "Moyen", "question": "Qui était le chef de la France libre pendant la Seconde Guerre mondiale ?", "answers": ["De Gaulle","Pétain","Blum","Daladier"], "correct": 0, "explanation": "Charles de Gaulle lance l’appel du 18 juin 1940." },
+{ "theme": "Histoire", "difficulty": "Moyen", "question": "Quel pays est à l’origine de la Renaissance ?", "answers": ["Espagne","France","Italie","Angleterre"], "correct": 2, "explanation": "La Renaissance débute à Florence au XVe siècle." },
+{ "theme": "Histoire", "difficulty": "Moyen", "question": "Quelle organisation internationale est créée en 1945 ?", "answers": ["OTAN","ONU","SDN","UE"], "correct": 1, "explanation": "L’Organisation des Nations unies vise à maintenir la paix mondiale." },
+{ "theme": "Histoire", "difficulty": "Difficile", "question": "En quelle année Constantinople tombe-t-elle aux mains des Ottomans ?", "answers": ["1453","1415","1520","1492"], "correct": 0, "explanation": "La chute marque la fin de l’Empire byzantin." },
+{ "theme": "Histoire", "difficulty": "Difficile", "question": "Quel traité met fin à la guerre de Trente Ans en 1648 ?", "answers": ["Verdun","Westphalie","Utrecht","Tordesillas"], "correct": 1, "explanation": "Il redessine l’Europe et affirme la souveraineté des États." },
+{ "theme": "Histoire", "difficulty": "Difficile", "question": "Quel roi anglais est décapité en 1649 ?", "answers": ["Henri VIII","Édouard VI","Charles Ier","Jacques II"], "correct": 2, "explanation": "Charles Ier est exécuté après la guerre civile anglaise." },
+{ "theme": "Histoire", "difficulty": "Difficile", "question": "Quel philosophe inspire fortement la Déclaration des droits de l’homme ?", "answers": ["Hobbes","Rousseau","Machiavel","Locke"], "correct": 1, "explanation": "Jean-Jacques Rousseau développe la théorie du contrat social." },
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   { "theme": "Géographie", "difficulty": "Facile", "question": "Quelle est la capitale de la France ?", "answers": ["Lyon", "Marseille", "Bordeaux", "Paris"], "correct": 3, "explanation": "Paris est la capitale et la plus grande ville de France, siège du gouvernement depuis des siècles." },
