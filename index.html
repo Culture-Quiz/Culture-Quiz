@@ -1682,7 +1682,7 @@ body { padding-top: 78px; }
     <button class="nav-link" id="nav-badges" onclick="navTo('badges')">
       <span class="nav-icon">🎖️</span>
       <span class="nav-label">Badges</span>
-      <span class="nav-badge">Bientôt</span>
+      </button>
     </button>
   </div>
 
@@ -1993,9 +1993,18 @@ body { padding-top: 78px; }
         <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Dévoreur de Pages</span><span class="badge-desc">50 bonnes réponses en Littérature</span></div>
         <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Cinéphile</span><span class="badge-desc">50 bonnes réponses en Cinéma</span></div>
       </div>
-      <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;padding-bottom:20px;">
-        Le système de badges arrive bientôt — restez connecté ! 🚀
-      </p>
+      <div style="text-align:center;padding-bottom:28px;">
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px;font-style:italic;">
+          Jouez pour débloquer tous les badges ! 🚀
+        </p>
+        <button class="badges-reset-btn" onclick="resetAllData()" style="
+          background:none;border:2px solid var(--error);color:var(--error);
+          border-radius:10px;padding:10px 22px;font-size:0.88rem;font-weight:700;
+          cursor:pointer;font-family:var(--font-body);transition:all 0.2s ease;
+        " onmouseover="this.style.background='var(--error-light)'" onmouseout="this.style.background='none'">
+          🗑️ Réinitialiser toutes les données
+        </button>
+      </div>
     </div>
 
   </main>
@@ -2115,6 +2124,50 @@ const SB_URL = "https://tccugrfyuydcrcthlqpc.supabase.co";
 const SB_KEY = "sb_publishable_P8XLnr5F8Ih1t6L3WxpcdA_EozSB-jS";
 const { createClient } = supabase;
 const sb = createClient(SB_URL, SB_KEY);
+/* =====================================================
+   SYSTÈME DE DONNÉES UNIFIÉ — localStorage
+===================================================== */
+const DATA_KEY = "quizAppData";
+
+function loadAppData() {
+  try {
+    return JSON.parse(localStorage.getItem(DATA_KEY)) || {
+      history: [],
+      challengeRecord: 0,
+      badges: {}
+    };
+  } catch { return { history: [], challengeRecord: 0, badges: {} }; }
+}
+
+function saveAppData(data) {
+  localStorage.setItem(DATA_KEY, JSON.stringify(data));
+}
+
+function resetAllData() {
+  if (!confirm("⚠️ Réinitialiser TOUT ?\n\n• Historique des scores\n• Record du défi\n• Badges débloqués\n\nCette action est irréversible.")) return;
+  localStorage.removeItem(DATA_KEY);
+  localStorage.removeItem("quizHistory");       // legacy
+  localStorage.removeItem("challengeRecord");   // legacy
+  renderHistory();
+  updateChallengeBestDisplay();
+  renderBadges();
+  showToast("✅ Toutes les données ont été réinitialisées.");
+}
+
+// Migration des données legacy au premier chargement
+function migrateData() {
+  const legacyHistory = localStorage.getItem("quizHistory");
+  const legacyRecord  = localStorage.getItem("challengeRecord");
+  const existing = loadAppData();
+  let changed = false;
+  if (legacyHistory && !existing.history?.length) {
+    try { existing.history = JSON.parse(legacyHistory); changed = true; } catch {}
+  }
+  if (legacyRecord && !existing.challengeRecord) {
+    existing.challengeRecord = parseInt(legacyRecord, 10) || 0; changed = true;
+  }
+  if (changed) saveAppData(existing);
+}
 
 const LB_MAX = 10;
 
@@ -2306,11 +2359,13 @@ function init() {
       return response.json();
     })
     .then(data => {
+	  migrateData();
       QUESTIONS = data;
       buildUI();
       renderHistory();
       updateChallengeBestDisplay();
       renderLeaderboard();
+	  renderBadges();
     })
     .catch(error => {
       document.getElementById("main-content").innerHTML = `
@@ -2392,11 +2447,13 @@ function startRandom(difficulty) {
    MODE DÉFI
 ===================================================== */
 function loadChallengeRecord() {
-  return parseInt(localStorage.getItem("challengeRecord") || "0", 10);
+  return loadAppData().challengeRecord || 0;
 }
 
 function saveChallengeRecord(val) {
-  localStorage.setItem("challengeRecord", String(val));
+  const data = loadAppData();
+  data.challengeRecord = val;
+  saveAppData(data);
 }
 
 function updateChallengeBestDisplay() {
@@ -2559,7 +2616,8 @@ async function showChallengeResult() {
       setTimeout(() => openPseudoModal(streak), 600);
     }
   }
-
+checkAndUnlockBadges();
+  renderBadges();
   renderLeaderboard();
 }
 
@@ -2685,6 +2743,14 @@ function showResult() {
     gameState.mistakes.length > 0 ? "block" : "none";
 
   if (!gameState.isRevision) recordResult(gameState.lastTheme, score, total);
+  // Tracking bonnes réponses par catégorie
+  if (!gameState.isRandom && gameState.lastTheme && !gameState.isRevision) {
+    const catName = gameState.lastTheme.replace("Test: ", "").replace(" — Erreurs", "");
+    const cat = CATEGORIES.find(c => c.name === catName);
+    if (cat) recordCategoryCorrect(cat.name, gameState.score);
+  }
+  checkAndUnlockBadges();
+  renderBadges();
   showScreen("screen-result");
 }
 
@@ -2802,12 +2868,13 @@ function showToast(message) {
    HISTORIQUE DES SCORES (localStorage)
 ===================================================== */
 function loadHistory() {
-  try { return JSON.parse(localStorage.getItem("quizHistory")) || []; }
-  catch(e) { return []; }
+  return loadAppData().history || [];
 }
 
 function saveHistory(history) {
-  localStorage.setItem("quizHistory", JSON.stringify(history));
+  const data = loadAppData();
+  data.history = history;
+  saveAppData(data);
 }
 
 function recordResult(theme, score, total) {
@@ -3147,6 +3214,7 @@ function navTo(page) {
     buildThemesScreen();
     showScreen("screen-themes");
   } else if (page === "badges") {
+    renderBadges();
     showScreen("screen-badges");
   }
 }
@@ -3234,6 +3302,167 @@ document.addEventListener("click", function(e) {
     btn.classList.remove("active");
   }
 });
+
+/* =====================================================
+   BADGES — Définitions & logique
+===================================================== */
+const BADGE_DEFS = [
+  // Mode Défi — Série
+  { id: "survivant",    icon: "🛡️",  name: "Survivant",       desc: "Atteindre une série de 25",                group: "challenge", check: d => d.challengeRecord >= 25 },
+  { id: "infaillible",  icon: "⚡",  name: "Infaillible",      desc: "Atteindre une série de 50",                group: "challenge", check: d => d.challengeRecord >= 50 },
+  { id: "centurion",    icon: "💯",  name: "Centurion",        desc: "Atteindre une série de 100",               group: "challenge", check: d => d.challengeRecord >= 100 },
+  { id: "intouchable",  icon: "👑",  name: "Intouchable",      desc: "Atteindre une série de 200",               group: "challenge", check: d => d.challengeRecord >= 200 },
+
+  // Tests thématiques — 20/20
+  { id: "first_perfect_themed",  icon: "🎯", name: "Premier Sans-Faute", desc: "Réussir 1 test thématique en 20/20",  group: "themed",
+    check: d => (d.history||[]).filter(h => h.total === 20 && h.score === 20).length >= 1 },
+  { id: "elite",        icon: "🌠", name: "Élite",             desc: "Réussir 5 tests thématiques en 20/20",     group: "themed",
+    check: d => (d.history||[]).filter(h => h.total === 20 && h.score === 20).length >= 5 },
+  { id: "maitre_tests", icon: "🏆", name: "Maître des Tests",  desc: "Réussir 20 tests thématiques en 20/20",    group: "themed",
+    check: d => (d.history||[]).filter(h => h.total === 20 && h.score === 20).length >= 20 },
+
+  // Quiz classiques — 10/10
+  { id: "sans_accroc",  icon: "✨", name: "Sans Accroc",       desc: "Obtenir 10/10 à un quiz",                  group: "classic",
+    check: d => (d.history||[]).some(h => h.total === 10 && h.score === 10) },
+  { id: "crack",        icon: "🔥", name: "Crack",             desc: "Obtenir 10/10 à 4 quiz différents",        group: "classic",
+    check: d => (d.history||[]).filter(h => h.total === 10 && h.score === 10).length >= 4 },
+  { id: "encyclopediste", icon:"📖",name: "Encyclopédiste",    desc: "Obtenir 10/10 dans toutes les catégories", group: "classic",
+    check: d => CATEGORIES.every(cat => (d.history||[]).some(h => h.theme === cat.name && h.score === 10 && h.total === 10)) },
+
+  // Quiz aléatoire — 10/10 par difficulté
+  { id: "bonne_pioche", icon: "🎲", name: "Bonne Pioche",      desc: "10/10 au quiz aléatoire Facile",           group: "random",
+    check: d => (d.history||[]).some(h => h.theme === "Aléatoire — Facile" && h.score === 10) },
+  { id: "sang_froid",   icon: "🧊", name: "Sang-Froid",        desc: "10/10 au quiz aléatoire Moyen",            group: "random",
+    check: d => (d.history||[]).some(h => h.theme === "Aléatoire — Moyen"  && h.score === 10) },
+  { id: "erudit",       icon: "🎓", name: "Érudit",            desc: "10/10 au quiz aléatoire Difficile",        group: "random",
+    check: d => (d.history||[]).some(h => h.theme === "Aléatoire — Difficile" && h.score === 10) },
+
+  // Maîtrise par catégorie — 50 bonnes réponses
+  { id: "memoire_guerre",  icon: "⚔️",  name: "Mémoire de Guerre", desc: "50 bonnes réponses en Histoire",      group: "mastery",
+    check: d => (d.categoryCorrect?.["Histoire"] || 0) >= 50 },
+  { id: "globe_trotteur",  icon: "🌍",  name: "Globe-Trotteur",    desc: "50 bonnes réponses en Géographie",    group: "mastery",
+    check: d => (d.categoryCorrect?.["Géographie"] || 0) >= 50 },
+  { id: "oeil_lynx",       icon: "👁️",  name: "Œil de Lynx",       desc: "50 bonnes réponses en Art",           group: "mastery",
+    check: d => (d.categoryCorrect?.["Art"] || 0) >= 50 },
+  { id: "esprit_analytique",icon:"🔬", name: "Esprit Analytique",  desc: "50 bonnes réponses en Sciences",      group: "mastery",
+    check: d => (d.categoryCorrect?.["Sciences"] || 0) >= 50 },
+  { id: "puits_science",   icon: "🧠",  name: "Puits de Science",  desc: "50 bonnes réponses en Culture générale", group: "mastery",
+    check: d => (d.categoryCorrect?.["Culture générale"] || 0) >= 50 },
+  { id: "oreille_absolue", icon: "🎵",  name: "Oreille Absolue",   desc: "50 bonnes réponses en Musique",       group: "mastery",
+    check: d => (d.categoryCorrect?.["Musique"] || 0) >= 50 },
+  { id: "devoreur_pages",  icon: "📚",  name: "Dévoreur de Pages", desc: "50 bonnes réponses en Littérature",   group: "mastery",
+    check: d => (d.categoryCorrect?.["Littérature"] || 0) >= 50 },
+  { id: "cinephile",       icon: "🎬",  name: "Cinéphile",         desc: "50 bonnes réponses en Cinéma",        group: "mastery",
+    check: d => (d.categoryCorrect?.["Cinéma"] || 0) >= 50 },
+];
+
+function checkAndUnlockBadges() {
+  const data = loadAppData();
+  if (!data.badges) data.badges = {};
+  const newlyUnlocked = [];
+
+  BADGE_DEFS.forEach(badge => {
+    if (!data.badges[badge.id] && badge.check(data)) {
+      data.badges[badge.id] = { unlockedAt: new Date().toLocaleDateString("fr-FR") };
+      newlyUnlocked.push(badge);
+    }
+  });
+
+  if (newlyUnlocked.length) {
+    saveAppData(data);
+    newlyUnlocked.forEach((b, i) => {
+      setTimeout(() => {
+        showToast(`🎖️ Badge débloqué : ${b.name} ${b.icon}`);
+      }, i * 1200);
+    });
+  }
+  return newlyUnlocked;
+}
+
+function recordCategoryCorrect(theme, correctCount) {
+  if (!correctCount) return;
+  const data = loadAppData();
+  if (!data.categoryCorrect) data.categoryCorrect = {};
+  data.categoryCorrect[theme] = (data.categoryCorrect[theme] || 0) + correctCount;
+  saveAppData(data);
+}
+
+function renderBadges() {
+  const data = loadAppData();
+  const unlockedBadges = data.badges || {};
+
+  const groups = [
+    { id: "challenge", label: "⚡ Mode Défi",            sub: "Enchaînez les bonnes réponses sans la moindre erreur" },
+    { id: "themed",    label: "🎯 Tests thématiques",    sub: "Terminez des tests longs avec un score parfait" },
+    { id: "classic",   label: "✨ Quiz classiques",      sub: "Obtenez 10/10 sur les quiz par catégorie" },
+    { id: "random",    label: "🎲 Quiz aléatoire",       sub: "Réussissez sans filet dans le mode aléatoire" },
+    { id: "mastery",   label: "🏅 Maîtrise par catégorie", sub: "Accumulez 50 bonnes réponses dans chaque domaine" },
+  ];
+
+  const screen = document.getElementById("screen-badges");
+
+  // Conserver le dernier élément (le <p> italique) et le bouton reset si présent
+  const resetBtn = screen.querySelector(".badges-reset-btn");
+  const italicP  = screen.querySelector("p[style*='italic']");
+  screen.innerHTML = "";
+
+  // En-tête
+  screen.innerHTML = `
+    <div style="text-align:center;margin-bottom:36px;">
+      <div style="font-size:3rem;margin-bottom:10px;">🎖️</div>
+      <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);font-weight:bold;margin-bottom:8px;">Badges</div>
+      <p style="color:var(--text-muted);font-size:0.95rem;max-width:420px;margin:0 auto;line-height:1.6;">
+        Débloquez des récompenses en progressant dans vos quizs. Chaque badge témoigne d'une maîtrise.
+      </p>
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <span id="badge-unlocked-count" style="background:var(--accent-light);color:var(--accent);font-weight:700;font-size:0.88rem;padding:5px 14px;border-radius:20px;border:2px solid var(--accent);">
+          ${Object.keys(unlockedBadges).length} / ${BADGE_DEFS.length} débloqués
+        </span>
+      </div>
+    </div>
+  `;
+
+  groups.forEach(group => {
+    const badges = BADGE_DEFS.filter(b => b.group === group.id);
+    const groupDiv = document.createElement("div");
+    groupDiv.style.marginBottom = "32px";
+    groupDiv.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">${group.label}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">${group.sub}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
+    `;
+    const grid = groupDiv.querySelector("div:last-child");
+
+    badges.forEach(badge => {
+      const isUnlocked = !!unlockedBadges[badge.id];
+      const card = document.createElement("div");
+      card.className = "badge-card" + (isUnlocked ? "" : " locked");
+      if (isUnlocked) card.style.borderColor = "var(--accent)";
+      card.innerHTML = `
+        <span class="badge-icon">${isUnlocked ? badge.icon : "🔒"}</span>
+        <span class="badge-name">${badge.name}</span>
+        <span class="badge-desc">${badge.desc}</span>
+        ${isUnlocked ? `<span style="font-size:0.7rem;color:var(--success);font-weight:600;margin-top:2px;">✓ Débloqué le ${unlockedBadges[badge.id].unlockedAt}</span>` : ""}
+      `;
+      if (isUnlocked) {
+        card.style.animation = "none";
+        card.title = `Débloqué le ${unlockedBadges[badge.id].unlockedAt}`;
+      }
+      grid.appendChild(card);
+    });
+
+    screen.appendChild(groupDiv);
+  });
+
+  // Note de bas de page
+  screen.innerHTML += `<p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;padding-bottom:20px;">
+    Jouez pour débloquer tous les badges ! 🚀
+  </p>`;
+}
 
 /* Lancement */
 init();
