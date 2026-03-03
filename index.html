@@ -3443,6 +3443,8 @@ function renderBadges() {
       const isUnlocked = !!unlockedBadges[badge.id];
       const card = document.createElement("div");
       card.className = "badge-card" + (isUnlocked ? "" : " locked");
+      card.style.width = "150px";
+      card.style.flexShrink = "0";
       if (isUnlocked) card.style.borderColor = "var(--accent)";
       card.innerHTML = `
         <span class="badge-icon">${isUnlocked ? badge.icon : "🔒"}</span>
