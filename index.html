@@ -1657,6 +1657,12 @@ body { padding-top: 78px; }
   line-height: 1.5;
 }
 
+#screen-themes,
+#screen-badges {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 </style>
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2744,8 +2750,11 @@ function showScreen(id) {
   document.getElementById(id).classList.add("active");
 
   const isHome = id === "screen-home";
+  const isFullPage = id === "screen-themes" || id === "screen-badges" || id === "screen-revision";
+
   document.getElementById("sidebar").style.display = isHome ? "" : "none";
   document.getElementById("challenge-sidebar").style.display = isHome ? "" : "none";
+  document.getElementById("app-layout").style.justifyContent = isFullPage ? "center" : "";
 }
 
 /* =====================================================
