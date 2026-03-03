@@ -48,15 +48,15 @@ body.dark {
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+}
 
   /* ===== SCREENS ===== */
   .screen { display: none; width: 100%; max-width: 680px; }
@@ -1787,13 +1787,21 @@ async function lb_load() {
     const { data, error } = await sb
       .from("leaderboard")
       .select("pseudo, score, date")
-      .order("score", { ascending: false })
-      .limit(LB_MAX);
+      .order("score", { ascending: false });
     if (error) throw error;
-    return data || [];
+
+    // Garder uniquement le meilleur score par pseudo
+    const seen = new Set();
+    const deduped = (data || []).filter(entry => {
+      const key = entry.pseudo.toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, LB_MAX);
+
+    return deduped;
   } catch (e) {
     console.warn("Supabase lb_load error:", e.message);
-    // Fallback localStorage
     try { return JSON.parse(localStorage.getItem("challengeLeaderboard")) || []; }
     catch { return []; }
   }
