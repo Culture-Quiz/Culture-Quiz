@@ -491,9 +491,16 @@ body.dark {
 
   /* Contenu principal */
   #main-content {
-    flex: 1;
-    min-width: 0;
-  }
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#main-content .screen {
+  width: 100%;
+}
 
   /* ===== COLONNE DÉFI (droite) ===== */
   #challenge-sidebar {
@@ -1511,7 +1518,7 @@ td, th {
 }
 
 /* Décale le contenu pour ne pas être masqué par la navbar */
-body { padding-top: 58px; }
+body { padding-top: 78px; }
 
 /* Mobile : icônes seules sous 520px */
 @media (max-width: 520px) {
@@ -1519,6 +1526,82 @@ body { padding-top: 58px; }
   .nav-link .nav-label { display: none; }
   .nav-link { padding: 8px 12px; }
   .nav-link .nav-badge { display: none; }
+}
+
+/* ===== SETTINGS DROPDOWN ===== */
+.settings-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  min-width: 220px;
+  z-index: 500;
+  animation: fadeIn 0.15s ease;
+}
+.settings-dropdown.open { display: block; }
+
+.settings-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.settings-row:hover { background: var(--accent-light); }
+
+.settings-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Toggle switch */
+.settings-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 20px;
+  background: var(--border);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.25s ease;
+}
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s ease;
+}
+.settings-toggle.on {
+  background: var(--accent);
+}
+.settings-toggle.on::after {
+  transform: translateX(18px);
 }
 
 </style>
@@ -1544,6 +1627,31 @@ body { padding-top: 58px; }
       <span class="nav-label">Badges</span>
       <span class="nav-badge">Bientôt</span>
     </button>
+  </div>
+
+  <!-- Paramètres -->
+  <div style="position:relative;">
+    <button class="nav-link" id="nav-settings-btn" onclick="toggleSettingsMenu()">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Paramètres</span>
+    </button>
+    <div class="settings-dropdown" id="settings-dropdown">
+      <div class="settings-title">Paramètres</div>
+      <div class="settings-row" onclick="toggleDark()">
+        <span class="settings-row-left">
+          <span id="settings-dark-icon">🌙</span>
+          <span>Mode sombre</span>
+        </span>
+        <div class="settings-toggle" id="settings-dark-toggle"></div>
+      </div>
+      <div class="settings-row" onclick="toggleSound()">
+        <span class="settings-row-left">
+          <span id="settings-sound-icon">🔊</span>
+          <span>Son</span>
+        </span>
+        <div class="settings-toggle" id="settings-sound-toggle"></div>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1835,40 +1943,54 @@ body { padding-top: 58px; }
     <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">🎖️ Badges</div>
     <p style="color:var(--text-muted);">Débloquez des badges en progressant dans vos quizs.</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
-    <!-- Badge verrouillé (template × 6) -->
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Historien</span>
-      <span class="badge-desc">Terminer le quiz Histoire</span>
-    </div>
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Géographe</span>
-      <span class="badge-desc">Terminer le quiz Géographie</span>
-    </div>
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Scientifique</span>
-      <span class="badge-desc">Terminer le quiz Sciences</span>
-    </div>
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Perfectionniste</span>
-      <span class="badge-desc">Obtenir 10/10 sur un quiz</span>
-    </div>
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Challenger</span>
-      <span class="badge-desc">Atteindre 10 en Mode Défi</span>
-    </div>
-    <div class="badge-card locked">
-      <span class="badge-icon">🔒</span>
-      <span class="badge-name">Légendaire</span>
-      <span class="badge-desc">Atteindre 30 en Mode Défi</span>
-    </div>
+
+  <!-- MODE DÉFI -->
+  <div class="section-title" style="margin-bottom:14px;">⚡ Mode Défi</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Survivant</span><span class="badge-desc">Atteindre une série de 25</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Infaillible</span><span class="badge-desc">Atteindre une série de 50</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Centurion</span><span class="badge-desc">Atteindre une série de 100</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Intouchable</span><span class="badge-desc">Atteindre une série de 200</span></div>
   </div>
-  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:28px;font-style:italic;">
+
+  <!-- TESTS THÉMATIQUES -->
+  <div class="section-title" style="margin-bottom:14px;">🎯 Tests thématiques</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Premier Sans-Faute</span><span class="badge-desc">Réussir 1 test thématique en 20/20</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Élite</span><span class="badge-desc">Réussir 5 tests thématiques en 20/20</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Maître des Tests</span><span class="badge-desc">Réussir 20 tests thématiques en 20/20</span></div>
+  </div>
+
+  <!-- QUIZ CLASSIQUES -->
+  <div class="section-title" style="margin-bottom:14px;">✨ Quiz classiques</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sans Accroc</span><span class="badge-desc">Obtenir 10/10 à un quiz</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Crack</span><span class="badge-desc">Obtenir 10/10 à 4 quiz différents</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Encyclopédiste</span><span class="badge-desc">Obtenir 10/10 dans toutes les catégories</span></div>
+  </div>
+
+  <!-- QUIZ ALÉATOIRE -->
+  <div class="section-title" style="margin-bottom:14px;">🎲 Quiz aléatoire</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Bonne Pioche</span><span class="badge-desc">10/10 au quiz aléatoire Facile</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sang-Froid</span><span class="badge-desc">10/10 au quiz aléatoire Moyen</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Érudit</span><span class="badge-desc">10/10 au quiz aléatoire Difficile</span></div>
+  </div>
+
+  <!-- MAÎTRISE PAR CATÉGORIE -->
+  <div class="section-title" style="margin-bottom:14px;">🏅 Maîtrise par catégorie</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Mémoire de Guerre</span><span class="badge-desc">50 bonnes réponses en Histoire</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Globe-Trotteur</span><span class="badge-desc">50 bonnes réponses en Géographie</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Œil de Lynx</span><span class="badge-desc">50 bonnes réponses en Art</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Esprit Analytique</span><span class="badge-desc">50 bonnes réponses en Sciences</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Puits de Science</span><span class="badge-desc">50 bonnes réponses en Culture générale</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Oreille Absolue</span><span class="badge-desc">50 bonnes réponses en Musique</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Dévoreur de Pages</span><span class="badge-desc">50 bonnes réponses en Littérature</span></div>
+    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Cinéphile</span><span class="badge-desc">50 bonnes réponses en Cinéma</span></div>
+  </div>
+
+  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;">
     Le système de badges arrive bientôt — restez connecté ! 🚀
   </p>
 </div>
@@ -2745,11 +2867,7 @@ document.addEventListener("keydown", function(e) {
 let soundEnabled = true;
 
 function syncSoundButtons() {
-  const val = soundEnabled ? "🔊" : "🔇";
-  ["sound-toggle", "sound-toggle-challenge"].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) btn.textContent = val;
-  });
+  syncSettingsUI();
 }
 
 (function() {
@@ -2761,9 +2879,9 @@ function syncSoundButtons() {
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-  syncSoundButtons();
-  showToast(soundEnabled ? "Son activé 🔊" : "Son désactivé 🔇");
   localStorage.setItem("soundEnabled", soundEnabled ? "1" : "0");
+  syncSettingsUI();
+  showToast(soundEnabled ? "Son activé 🔊" : "Son désactivé 🔇");
 }
 
 function playSound(type) {
@@ -2799,8 +2917,8 @@ function playSound(type) {
 ===================================================== */
 function toggleDark() {
   const isDark = document.body.classList.toggle("dark");
-  document.getElementById("theme-toggle").textContent = isDark ? "☀️" : "🌙";
   localStorage.setItem("darkMode", isDark ? "1" : "0");
+  syncSettingsUI();
 }
 
 (function() {
@@ -3029,6 +3147,46 @@ goHome = function() {
   const nh = document.getElementById("nav-home");
   if (nh) nh.classList.add("active");
 };
+
+function syncSettingsUI() {
+  const isDark = document.body.classList.contains("dark");
+  const themeBtn = document.getElementById("theme-toggle");
+  if (themeBtn) themeBtn.textContent = isDark ? "☀️" : "🌙";
+
+  // Toggles dropdown
+  const darkToggle = document.getElementById("settings-dark-toggle");
+  const soundToggle = document.getElementById("settings-sound-toggle");
+  const darkIcon = document.getElementById("settings-dark-icon");
+  const soundIcon = document.getElementById("settings-sound-icon");
+
+  if (darkToggle) darkToggle.classList.toggle("on", isDark);
+  if (soundToggle) soundToggle.classList.toggle("on", soundEnabled);
+  if (darkIcon) darkIcon.textContent = isDark ? "☀️" : "🌙";
+  if (soundIcon) soundIcon.textContent = soundEnabled ? "🔊" : "🔇";
+
+  // Anciens boutons son dans le quiz
+  ["sound-toggle", "sound-toggle-challenge"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.textContent = soundEnabled ? "🔊" : "🔇";
+  });
+}
+
+function toggleSettingsMenu() {
+  const dropdown = document.getElementById("settings-dropdown");
+  const btn = document.getElementById("nav-settings-btn");
+  dropdown.classList.toggle("open");
+  btn.classList.toggle("active", dropdown.classList.contains("open"));
+}
+
+// Fermer le dropdown en cliquant ailleurs
+document.addEventListener("click", function(e) {
+  const dropdown = document.getElementById("settings-dropdown");
+  const btn = document.getElementById("nav-settings-btn");
+  if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+    dropdown.classList.remove("open");
+    btn.classList.remove("active");
+  }
+});
 
 /* Lancement */
 init();
