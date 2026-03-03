@@ -1604,6 +1604,59 @@ body { padding-top: 78px; }
   transform: translateX(18px);
 }
 
+/* ===== BADGES ===== */
+.badge-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.badge-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #F7922A);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.badge-card.locked {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+.badge-card:not(.locked):hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.badge-card:not(.locked):hover::before { opacity: 1; }
+
+.badge-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.badge-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--text);
+  line-height: 1.2;
+}
+.badge-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 </style>
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1938,14 +1991,26 @@ body { padding-top: 78px; }
 </div>
 
 <!-- BADGES SCREEN -->
+<!-- BADGES SCREEN -->
 <div id="screen-badges" class="screen" style="max-width:680px;margin:0 auto;">
-  <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">🎖️ Badges</div>
-    <p style="color:var(--text-muted);">Débloquez des badges en progressant dans vos quizs.</p>
+
+  <!-- En-tête -->
+  <div style="text-align:center;margin-bottom:36px;">
+    <div style="font-size:3rem;margin-bottom:10px;">🎖️</div>
+    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);font-weight:bold;margin-bottom:8px;">Badges</div>
+    <p style="color:var(--text-muted);font-size:0.95rem;max-width:420px;margin:0 auto;line-height:1.6;">
+      Débloquez des récompenses en progressant dans vos quizs. Chaque badge témoigne d'une maîtrise.
+    </p>
   </div>
 
   <!-- MODE DÉFI -->
-  <div class="section-title" style="margin-bottom:14px;">⚡ Mode Défi</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+    <span style="font-size:1.3rem;">⚡</span>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Mode Défi</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Enchaînez les bonnes réponses sans la moindre erreur</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Survivant</span><span class="badge-desc">Atteindre une série de 25</span></div>
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Infaillible</span><span class="badge-desc">Atteindre une série de 50</span></div>
@@ -1954,7 +2019,13 @@ body { padding-top: 78px; }
   </div>
 
   <!-- TESTS THÉMATIQUES -->
-  <div class="section-title" style="margin-bottom:14px;">🎯 Tests thématiques</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+    <span style="font-size:1.3rem;">🎯</span>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Tests thématiques</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Terminez des tests longs avec un score parfait</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Premier Sans-Faute</span><span class="badge-desc">Réussir 1 test thématique en 20/20</span></div>
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Élite</span><span class="badge-desc">Réussir 5 tests thématiques en 20/20</span></div>
@@ -1962,7 +2033,13 @@ body { padding-top: 78px; }
   </div>
 
   <!-- QUIZ CLASSIQUES -->
-  <div class="section-title" style="margin-bottom:14px;">✨ Quiz classiques</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+    <span style="font-size:1.3rem;">✨</span>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz classiques</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Obtenez 10/10 sur les quiz par catégorie</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sans Accroc</span><span class="badge-desc">Obtenir 10/10 à un quiz</span></div>
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Crack</span><span class="badge-desc">Obtenir 10/10 à 4 quiz différents</span></div>
@@ -1970,7 +2047,13 @@ body { padding-top: 78px; }
   </div>
 
   <!-- QUIZ ALÉATOIRE -->
-  <div class="section-title" style="margin-bottom:14px;">🎲 Quiz aléatoire</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+    <span style="font-size:1.3rem;">🎲</span>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz aléatoire</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Réussissez sans filet dans le mode aléatoire</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Bonne Pioche</span><span class="badge-desc">10/10 au quiz aléatoire Facile</span></div>
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sang-Froid</span><span class="badge-desc">10/10 au quiz aléatoire Moyen</span></div>
@@ -1978,7 +2061,13 @@ body { padding-top: 78px; }
   </div>
 
   <!-- MAÎTRISE PAR CATÉGORIE -->
-  <div class="section-title" style="margin-bottom:14px;">🏅 Maîtrise par catégorie</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+    <span style="font-size:1.3rem;">🏅</span>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Maîtrise par catégorie</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Accumulez 50 bonnes réponses dans chaque domaine</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Mémoire de Guerre</span><span class="badge-desc">50 bonnes réponses en Histoire</span></div>
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Globe-Trotteur</span><span class="badge-desc">50 bonnes réponses en Géographie</span></div>
@@ -1990,9 +2079,10 @@ body { padding-top: 78px; }
     <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Cinéphile</span><span class="badge-desc">50 bonnes réponses en Cinéma</span></div>
   </div>
 
-  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;">
+  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;padding-bottom:20px;">
     Le système de badges arrive bientôt — restez connecté ! 🚀
   </p>
+
 </div>
 
 <!-- ===== DIFFICULTY MODAL ===== -->
@@ -3091,10 +3181,12 @@ function navTo(page) {
     showScreen("screen-themes");
     document.getElementById("sidebar").style.display = "none";
     document.getElementById("challenge-sidebar").style.display = "none";
+    document.getElementById("app-layout").style.justifyContent = "center";
   } else if (page === "badges") {
     showScreen("screen-badges");
     document.getElementById("sidebar").style.display = "none";
     document.getElementById("challenge-sidebar").style.display = "none";
+    document.getElementById("app-layout").style.justifyContent = "center";
   }
 }
 
