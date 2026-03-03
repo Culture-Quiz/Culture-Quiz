@@ -491,16 +491,16 @@ body.dark {
 
   /* Contenu principal */
   #main-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-#main-content .screen {
-  width: 100%;
-}
+  #main-content .screen {
+    width: 100%;
+  }
 
   /* ===== COLONNE DÉFI (droite) ===== */
   #challenge-sidebar {
@@ -1657,12 +1657,6 @@ body { padding-top: 78px; }
   line-height: 1.5;
 }
 
-#screen-themes,
-#screen-badges {
-  margin-left: auto;
-  margin-right: auto;
-}
-
 #app-layout.centered {
   justify-content: center;
 }
@@ -1748,13 +1742,10 @@ body { padding-top: 78px; }
       <button class="random-btn" onclick="openRandomModal()">
         🎲 Quiz Aléatoire — toutes catégories
       </button>
-
-      <!-- HISTORIQUE DES SCORES -->
       <div class="history-section" id="history-section">
         <div class="section-title">🏅 Vos meilleurs scores</div>
         <div class="history-grid" id="history-grid"></div>
-        <button class="history-clear-btn" id="history-clear-btn"
-                onclick="clearHistory()" style="display:none">
+        <button class="history-clear-btn" id="history-clear-btn" onclick="clearHistory()" style="display:none">
           Effacer l'historique
         </button>
       </div>
@@ -1787,16 +1778,12 @@ body { padding-top: 78px; }
         <div class="question-text" id="question-text">…</div>
       </div>
       <div class="answers-grid" id="answers-grid"></div>
-
       <div class="explanation-box" id="explanation-box">
         <strong>💡 Explication :</strong> <span id="explanation-text"></span>
       </div>
-
       <button class="next-btn" id="next-btn" onclick="nextQuestion()">
         Question suivante →
       </button>
-
-      <!-- Signalement d'erreur -->
       <button class="report-btn" id="report-btn" onclick="toggleReportForm()">
         ⚠️ Signaler une erreur sur cette question
       </button>
@@ -1834,22 +1821,18 @@ body { padding-top: 78px; }
         </div>
         <span class="timer-count" id="timer-count">15</span>
       </div>
-      <!-- Catégorie de la question en cours -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <span class="challenge-cat-badge" id="challenge-cat-badge">—</span>
         <span style="font-size:0.8rem;color:var(--text-muted);" id="challenge-q-count">Question 1</span>
       </div>
-
       <div class="question-card" style="border-top:3px solid var(--challenge);">
         <div class="question-num" id="challenge-question-num">Question 1</div>
         <div class="question-text" id="challenge-question-text">…</div>
       </div>
       <div class="answers-grid" id="challenge-answers-grid"></div>
-
       <div class="explanation-box" id="challenge-explanation-box">
         <strong>💡 Explication :</strong> <span id="challenge-explanation-text"></span>
       </div>
-
       <button class="next-btn challenge-mode" id="challenge-next-btn" onclick="nextChallengeQuestion()">
         Question suivante →
       </button>
@@ -1860,11 +1843,9 @@ body { padding-top: 78px; }
       <div class="challenge-result-card">
         <span class="cr-emoji" id="ch-result-emoji">💥</span>
         <div class="cr-title" id="ch-result-title">Game Over !</div>
-
         <div class="new-record-banner" id="new-record-banner">
           🏆 Nouveau record personnel !
         </div>
-
         <div class="challenge-score-row">
           <div class="challenge-score-item">
             <span class="csi-val" id="ch-score-val">0</span>
@@ -1876,9 +1857,7 @@ body { padding-top: 78px; }
             <span class="csi-label">Meilleur record</span>
           </div>
         </div>
-
         <div class="challenge-result-message" id="ch-result-message"></div>
-
         <div class="result-actions">
           <button class="btn-primary" onclick="startChallenge()" style="background:linear-gradient(135deg,var(--challenge),#5B21B6);">
             ⚡ Rejouer le Défi
@@ -1902,16 +1881,121 @@ body { padding-top: 78px; }
             📝 Revoir mes erreurs
           </button>
           <div class="share-container">
-            <button class="btn-share" id="btn-native-share" onclick="shareResult()">
-              📤 Partager
-            </button>
-            <button class="btn-share" id="btn-copy" onclick="copyResult()">
-              📋 Copier le score
-            </button>
+            <button class="btn-share" id="btn-native-share" onclick="shareResult()">📤 Partager</button>
+            <button class="btn-share" id="btn-copy" onclick="copyResult()">📋 Copier le score</button>
           </div>
           <button class="btn-secondary" onclick="goHome()">🏠 Accueil</button>
         </div>
       </div>
+    </div>
+
+    <!-- REVISION SCREEN -->
+    <div id="screen-revision" class="screen">
+      <div class="revision-header">
+        <h2>📝 Révision</h2>
+        <p id="revision-subtitle">—</p>
+      </div>
+      <div class="revision-summary" id="revision-summary"></div>
+      <div id="revision-list"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <button class="btn-primary" id="revision-replay-btn">🔄 Rejouer ce thème</button>
+        <button class="btn-primary" id="revision-mistakes-btn" onclick="replayMistakes()" style="background:var(--error);">🎯 Rejouer mes erreurs uniquement</button>
+        <button class="btn-secondary" onclick="showScreen('screen-result')">← Retour aux résultats</button>
+        <button class="btn-secondary" onclick="goHome()">🏠 Accueil</button>
+      </div>
+    </div>
+
+    <!-- THÉMATIQUES SCREEN -->
+    <div id="screen-themes" class="screen">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">📚 Thématiques</div>
+        <p style="color:var(--text-muted);">Choisissez une catégorie pour lancer un quiz dédié.</p>
+      </div>
+      <div class="categories-grid" id="themes-grid"></div>
+      <div style="margin-top:32px;">
+        <div class="section-title">🎯 Tests spéciaux</div>
+        <div id="themes-special-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- BADGES SCREEN -->
+    <div id="screen-badges" class="screen">
+      <div style="text-align:center;margin-bottom:36px;">
+        <div style="font-size:3rem;margin-bottom:10px;">🎖️</div>
+        <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);font-weight:bold;margin-bottom:8px;">Badges</div>
+        <p style="color:var(--text-muted);font-size:0.95rem;max-width:420px;margin:0 auto;line-height:1.6;">
+          Débloquez des récompenses en progressant dans vos quizs. Chaque badge témoigne d'une maîtrise.
+        </p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <span style="font-size:1.3rem;">⚡</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Mode Défi</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Enchaînez les bonnes réponses sans la moindre erreur</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Survivant</span><span class="badge-desc">Atteindre une série de 25</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Infaillible</span><span class="badge-desc">Atteindre une série de 50</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Centurion</span><span class="badge-desc">Atteindre une série de 100</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Intouchable</span><span class="badge-desc">Atteindre une série de 200</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <span style="font-size:1.3rem;">🎯</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Tests thématiques</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Terminez des tests longs avec un score parfait</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Premier Sans-Faute</span><span class="badge-desc">Réussir 1 test thématique en 20/20</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Élite</span><span class="badge-desc">Réussir 5 tests thématiques en 20/20</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Maître des Tests</span><span class="badge-desc">Réussir 20 tests thématiques en 20/20</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <span style="font-size:1.3rem;">✨</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz classiques</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Obtenez 10/10 sur les quiz par catégorie</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sans Accroc</span><span class="badge-desc">Obtenir 10/10 à un quiz</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Crack</span><span class="badge-desc">Obtenir 10/10 à 4 quiz différents</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Encyclopédiste</span><span class="badge-desc">Obtenir 10/10 dans toutes les catégories</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <span style="font-size:1.3rem;">🎲</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz aléatoire</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Réussissez sans filet dans le mode aléatoire</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Bonne Pioche</span><span class="badge-desc">10/10 au quiz aléatoire Facile</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sang-Froid</span><span class="badge-desc">10/10 au quiz aléatoire Moyen</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Érudit</span><span class="badge-desc">10/10 au quiz aléatoire Difficile</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
+        <span style="font-size:1.3rem;">🏅</span>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Maîtrise par catégorie</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Accumulez 50 bonnes réponses dans chaque domaine</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Mémoire de Guerre</span><span class="badge-desc">50 bonnes réponses en Histoire</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Globe-Trotteur</span><span class="badge-desc">50 bonnes réponses en Géographie</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Œil de Lynx</span><span class="badge-desc">50 bonnes réponses en Art</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Esprit Analytique</span><span class="badge-desc">50 bonnes réponses en Sciences</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Puits de Science</span><span class="badge-desc">50 bonnes réponses en Culture générale</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Oreille Absolue</span><span class="badge-desc">50 bonnes réponses en Musique</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Dévoreur de Pages</span><span class="badge-desc">50 bonnes réponses en Littérature</span></div>
+        <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Cinéphile</span><span class="badge-desc">50 bonnes réponses en Cinéma</span></div>
+      </div>
+      <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;padding-bottom:20px;">
+        Le système de badges arrive bientôt — restez connecté ! 🚀
+      </p>
     </div>
 
   </main>
@@ -1922,7 +2006,6 @@ body { padding-top: 78px; }
       <div class="challenge-panel-title">⚡ Mode Défi</div>
       <h3>Jusqu'à la première erreur</h3>
       <p>Enchaînez les questions de toutes les catégories. Une seule erreur et c'est terminé !</p>
-
       <div class="challenge-record-box">
         <span class="cr-icon">🏆</span>
         <div>
@@ -1931,14 +2014,12 @@ body { padding-top: 78px; }
           <div class="cr-sub">bonne<span id="challenge-best-plural">s réponses</span></div>
         </div>
       </div>
-
       <button class="challenge-start-btn" onclick="startChallenge()">
         ⚡ Lancer le Défi
       </button>
     </div>
-	
+
     <div class="challenge-info-card">
-      <!-- LEADERBOARD -->
       <div class="leaderboard-panel">
         <div class="leaderboard-header">
           <span class="leaderboard-title">🏅 Classement</span>
@@ -1967,131 +2048,6 @@ body { padding-top: 78px; }
       </div>
     </div>
   </aside>
-
-</div>
-
-<!-- REVISION SCREEN (en dehors du layout) -->
-<div id="screen-revision" class="screen" style="max-width:680px;margin:0 auto;">
-  <div class="revision-header">
-    <h2>📝 Révision</h2>
-    <p id="revision-subtitle">—</p>
-  </div>
-  <div class="revision-summary" id="revision-summary"></div>
-  <div id="revision-list"></div>
-  <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-    <button class="btn-primary" id="revision-replay-btn">🔄 Rejouer ce thème</button>
-    <button class="btn-primary" id="revision-mistakes-btn" onclick="replayMistakes()" style="background:var(--error);">🎯 Rejouer mes erreurs uniquement</button>
-    <button class="btn-secondary" onclick="showScreen('screen-result')">← Retour aux résultats</button>
-    <button class="btn-secondary" onclick="goHome()">🏠 Accueil</button>
-  </div>
-</div>
-
-<!-- THÉMATIQUES SCREEN -->
-<div id="screen-themes" class="screen" style="max-width:680px;margin:0 auto;">
-  <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">📚 Thématiques</div>
-    <p style="color:var(--text-muted);">Choisissez une catégorie pour lancer un quiz dédié.</p>
-  </div>
-  <div class="categories-grid" id="themes-grid"></div>
-
-  <div style="margin-top:32px;">
-    <div class="section-title">🎯 Tests spéciaux</div>
-    <div id="themes-special-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-  </div>
-</div>
-
-<!-- BADGES SCREEN -->
-<!-- BADGES SCREEN -->
-<div id="screen-badges" class="screen" style="max-width:680px;margin:0 auto;">
-
-  <!-- En-tête -->
-  <div style="text-align:center;margin-bottom:36px;">
-    <div style="font-size:3rem;margin-bottom:10px;">🎖️</div>
-    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);font-weight:bold;margin-bottom:8px;">Badges</div>
-    <p style="color:var(--text-muted);font-size:0.95rem;max-width:420px;margin:0 auto;line-height:1.6;">
-      Débloquez des récompenses en progressant dans vos quizs. Chaque badge témoigne d'une maîtrise.
-    </p>
-  </div>
-
-  <!-- MODE DÉFI -->
-  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
-    <span style="font-size:1.3rem;">⚡</span>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Mode Défi</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Enchaînez les bonnes réponses sans la moindre erreur</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Survivant</span><span class="badge-desc">Atteindre une série de 25</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Infaillible</span><span class="badge-desc">Atteindre une série de 50</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Centurion</span><span class="badge-desc">Atteindre une série de 100</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Intouchable</span><span class="badge-desc">Atteindre une série de 200</span></div>
-  </div>
-
-  <!-- TESTS THÉMATIQUES -->
-  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
-    <span style="font-size:1.3rem;">🎯</span>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Tests thématiques</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Terminez des tests longs avec un score parfait</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Premier Sans-Faute</span><span class="badge-desc">Réussir 1 test thématique en 20/20</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Élite</span><span class="badge-desc">Réussir 5 tests thématiques en 20/20</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Maître des Tests</span><span class="badge-desc">Réussir 20 tests thématiques en 20/20</span></div>
-  </div>
-
-  <!-- QUIZ CLASSIQUES -->
-  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
-    <span style="font-size:1.3rem;">✨</span>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz classiques</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Obtenez 10/10 sur les quiz par catégorie</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sans Accroc</span><span class="badge-desc">Obtenir 10/10 à un quiz</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Crack</span><span class="badge-desc">Obtenir 10/10 à 4 quiz différents</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Encyclopédiste</span><span class="badge-desc">Obtenir 10/10 dans toutes les catégories</span></div>
-  </div>
-
-  <!-- QUIZ ALÉATOIRE -->
-  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
-    <span style="font-size:1.3rem;">🎲</span>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Quiz aléatoire</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Réussissez sans filet dans le mode aléatoire</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Bonne Pioche</span><span class="badge-desc">10/10 au quiz aléatoire Facile</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Sang-Froid</span><span class="badge-desc">10/10 au quiz aléatoire Moyen</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Érudit</span><span class="badge-desc">10/10 au quiz aléatoire Difficile</span></div>
-  </div>
-
-  <!-- MAÎTRISE PAR CATÉGORIE -->
-  <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;">
-    <span style="font-size:1.3rem;">🏅</span>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:bold;color:var(--text);">Maîtrise par catégorie</div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Accumulez 50 bonnes réponses dans chaque domaine</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Mémoire de Guerre</span><span class="badge-desc">50 bonnes réponses en Histoire</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Globe-Trotteur</span><span class="badge-desc">50 bonnes réponses en Géographie</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Œil de Lynx</span><span class="badge-desc">50 bonnes réponses en Art</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Esprit Analytique</span><span class="badge-desc">50 bonnes réponses en Sciences</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Puits de Science</span><span class="badge-desc">50 bonnes réponses en Culture générale</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Oreille Absolue</span><span class="badge-desc">50 bonnes réponses en Musique</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Dévoreur de Pages</span><span class="badge-desc">50 bonnes réponses en Littérature</span></div>
-    <div class="badge-card locked"><span class="badge-icon">🔒</span><span class="badge-name">Cinéphile</span><span class="badge-desc">50 bonnes réponses en Cinéma</span></div>
-  </div>
-
-  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;font-style:italic;padding-bottom:20px;">
-    Le système de badges arrive bientôt — restez connecté ! 🚀
-  </p>
 
 </div>
 
@@ -2174,7 +2130,6 @@ async function lb_load() {
       .order("score", { ascending: false });
     if (error) throw error;
 
-    // Garder uniquement le meilleur score par pseudo
     const seen = new Set();
     const deduped = (data || []).filter(entry => {
       const key = entry.pseudo.toLowerCase().trim();
@@ -2192,13 +2147,11 @@ async function lb_load() {
 }
 
 async function lb_save(newEntry) {
-  // newEntry = { pseudo, score, date }
   try {
     const { error } = await sb.from("leaderboard").insert([newEntry]);
     if (error) throw error;
   } catch (e) {
     console.warn("Supabase lb_save error:", e.message);
-    // Fallback localStorage
     let board = [];
     try { board = JSON.parse(localStorage.getItem("challengeLeaderboard")) || []; } catch {}
     board.push(newEntry);
@@ -2220,7 +2173,6 @@ async function lb_getRank(score) {
   return board.filter(e => e.score > score).length + 1;
 }
 
-// --- Affichage (async) ---
 async function renderLeaderboard() {
   const list = document.getElementById("leaderboard-list");
   if (!list) return;
@@ -2252,7 +2204,6 @@ async function renderLeaderboard() {
   }).join("");
 }
 
-// --- Modal pseudo (async) ---
 let _pendingScore = 0;
 
 async function openPseudoModal(score) {
@@ -2295,7 +2246,6 @@ async function submitPseudo() {
   showToast(`🏅 Score enregistré ! Vous êtes ${rank === 1 ? "1er" : rank + "ème"} au classement.`);
 }
 
-// Fermer en cliquant dehors
 document.getElementById("pseudo-modal").addEventListener("click", function(e) {
   if (e.target === this) closePseudoModal();
 });
@@ -2360,7 +2310,7 @@ function init() {
       buildUI();
       renderHistory();
       updateChallengeBestDisplay();
-      renderLeaderboard(); // chargement initial Supabase
+      renderLeaderboard();
     })
     .catch(error => {
       document.getElementById("main-content").innerHTML = `
@@ -2603,7 +2553,6 @@ async function showChallengeResult() {
   updateChallengeBestDisplay();
   showScreen("screen-challenge-result");
 
-  // Vérification asynchrone de l'éligibilité au classement
   if (streak > 0) {
     const qualifies = await lb_qualifies(streak);
     if (qualifies) {
@@ -2778,7 +2727,6 @@ function shuffle(arr) {
   return arr;
 }
 
-/* Fermer le modal en cliquant en dehors */
 document.getElementById("modal-overlay").addEventListener("click", function(e) {
   if (e.target === this) closeModal();
 });
@@ -2916,7 +2864,7 @@ function clearHistory() {
 }
 
 /* =====================================================
-   SIGNALEMENT D'ERREUR — Netlify Forms
+   SIGNALEMENT D'ERREUR
 ===================================================== */
 function toggleReportForm() {
   const form = document.getElementById("report-form");
@@ -3198,18 +3146,12 @@ function navTo(page) {
   } else if (page === "themes") {
     buildThemesScreen();
     showScreen("screen-themes");
-    document.getElementById("sidebar").style.display = "none";
-    document.getElementById("challenge-sidebar").style.display = "none";
   } else if (page === "badges") {
     showScreen("screen-badges");
-    document.getElementById("sidebar").style.display = "none";
-    document.getElementById("challenge-sidebar").style.display = "none";
-    document.getElementById("app-layout").style.justifyContent = "center";
   }
 }
 
 function buildThemesScreen() {
-  // Grille catégories (si vide)
   const grid = document.getElementById("themes-grid");
   if (grid.children.length === 0) {
     CATEGORIES.forEach(cat => {
@@ -3225,7 +3167,6 @@ function buildThemesScreen() {
       grid.appendChild(btn);
     });
   }
-  // Tests spéciaux
   const special = document.getElementById("themes-special-list");
   if (special.children.length === 0) {
     THEMED_TESTS.forEach(t => {
@@ -3249,7 +3190,6 @@ function buildThemesScreen() {
   }
 }
 
-// Synchroniser l'onglet actif quand on revient à l'accueil
 const _origGoHome = goHome;
 goHome = function() {
   _origGoHome();
@@ -3263,7 +3203,6 @@ function syncSettingsUI() {
   const themeBtn = document.getElementById("theme-toggle");
   if (themeBtn) themeBtn.textContent = isDark ? "☀️" : "🌙";
 
-  // Toggles dropdown
   const darkToggle = document.getElementById("settings-dark-toggle");
   const soundToggle = document.getElementById("settings-sound-toggle");
   const darkIcon = document.getElementById("settings-dark-icon");
@@ -3274,7 +3213,6 @@ function syncSettingsUI() {
   if (darkIcon) darkIcon.textContent = isDark ? "☀️" : "🌙";
   if (soundIcon) soundIcon.textContent = soundEnabled ? "🔊" : "🔇";
 
-  // Anciens boutons son dans le quiz
   ["sound-toggle", "sound-toggle-challenge"].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) btn.textContent = soundEnabled ? "🔊" : "🔇";
@@ -3288,7 +3226,6 @@ function toggleSettingsMenu() {
   btn.classList.toggle("active", dropdown.classList.contains("open"));
 }
 
-// Fermer le dropdown en cliquant ailleurs
 document.addEventListener("click", function(e) {
   const dropdown = document.getElementById("settings-dropdown");
   const btn = document.getElementById("nav-settings-btn");
