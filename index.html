@@ -1647,6 +1647,344 @@ body { padding-top: 78px; }
 #app-layout.centered {
   justify-content: center;
 }
+
+/* ===== PANNEAU RESSOURCES ===== */
+#resources-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px;
+  display: none; /* Affiché seulement pendant le quiz thématique */
+}
+
+.resources-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--border);
+  overflow: hidden;
+}
+
+.resources-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 2px solid var(--border);
+  background: linear-gradient(135deg, #1E3A5F 0%, #2D5A8E 100%);
+}
+
+.resources-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.resources-add-btn {
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  font-family: var(--font-body);
+  flex-shrink: 0;
+}
+.resources-add-btn:hover {
+  background: rgba(255,255,255,0.35);
+  transform: scale(1.12);
+}
+
+.resources-theme-label {
+  padding: 10px 16px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2D5A8E;
+  border-bottom: 1px solid var(--border);
+  background: #EFF6FF;
+}
+body.dark .resources-theme-label {
+  background: #1a2840;
+  color: #7eb3e8;
+}
+
+.resources-list {
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.resources-empty {
+  padding: 18px 10px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.resource-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.18s ease;
+  position: relative;
+}
+.resource-item:hover {
+  border-color: #2D5A8E;
+  background: #EFF6FF;
+  transform: translateX(2px);
+}
+body.dark .resource-item:hover {
+  background: #1a2840;
+  border-color: #7eb3e8;
+}
+
+.resource-item-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.resource-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.resource-item-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  text-decoration: none;
+  line-height: 1.3;
+}
+.resource-item-title:hover { color: #2D5A8E; }
+body.dark .resource-item-title:hover { color: #7eb3e8; }
+
+.resource-item-url {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-top: 2px;
+}
+
+.resource-item-type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-top: 4px;
+  display: inline-block;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.resource-item-type.article { background: #DBEAFE; color: #1E40AF; }
+.resource-item-type.video   { background: #FEE2E2; color: #991B1B; }
+.resource-item-type.podcast { background: #FEF3C7; color: #92400E; }
+.resource-item-type.site    { background: #D1FAE5; color: #065F46; }
+.resource-item-type.autre   { background: var(--border); color: var(--text-muted); }
+
+body.dark .resource-item-type.article { background: #1e3a6e; color: #93c5fd; }
+body.dark .resource-item-type.video   { background: #3b1515; color: #fca5a5; }
+body.dark .resource-item-type.podcast { background: #3b2e10; color: #fcd34d; }
+body.dark .resource-item-type.site    { background: #064e3b; color: #6ee7b7; }
+
+.resource-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-family: var(--font-body);
+}
+.resource-item:hover .resource-delete-btn { opacity: 1; }
+.resource-delete-btn:hover { color: var(--error); background: var(--error-light); }
+
+/* Modal ajout de ressource */
+.resources-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,46,0.55);
+  z-index: 600;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.resources-modal.active { display: flex; animation: fadeIn 0.2s ease; }
+
+.resources-modal-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 0;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(26,26,46,0.3);
+  overflow: hidden;
+}
+
+.resources-modal-header {
+  background: linear-gradient(135deg, #1E3A5F, #2D5A8E);
+  padding: 20px 24px 16px;
+  color: #fff;
+}
+.resources-modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+.resources-modal-header p {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.resources-modal-body { padding: 20px 24px 24px; }
+
+/* Étape mot de passe */
+.rm-step { display: none; }
+.rm-step.active { display: block; animation: fadeIn 0.2s ease; }
+
+.rm-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.rm-input {
+  width: 100%;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.18s ease;
+  margin-bottom: 14px;
+}
+.rm-input:focus { outline: none; border-color: #2D5A8E; }
+.rm-input.error { border-color: var(--error); }
+
+.rm-select {
+  width: 100%;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.18s ease;
+  margin-bottom: 14px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B7B' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+.rm-select:focus { outline: none; border-color: #2D5A8E; }
+
+.rm-error-msg {
+  color: var(--error);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: none;
+  animation: fadeIn 0.15s ease;
+}
+.rm-error-msg.visible { display: block; }
+
+.rm-btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #1E3A5F, #2D5A8E);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.18s ease;
+  margin-bottom: 8px;
+}
+.rm-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,58,95,0.3); }
+.rm-btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+.rm-btn-cancel {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px;
+  font-family: var(--font-body);
+}
+.rm-btn-cancel:hover { color: var(--text); }
+
+/* Indicateur session admin */
+.admin-session-badge {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.admin-session-badge.visible { display: flex; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  #resources-sidebar { display: none !important; }
+}
+
 </style>
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1914,6 +2252,75 @@ body { padding-top: 78px; }
     <div id="screen-badges" class="screen"></div>
 
   </main>
+
+<!-- ===== PANNEAU RESSOURCES (droite, visible en mode quiz thématique) ===== -->
+<aside id="resources-sidebar">
+  <div class="resources-panel">
+    <div class="resources-panel-header">
+      <div class="resources-panel-title">
+        <span>📖</span>
+        <span>Ressources</span>
+        <span class="admin-session-badge" id="admin-session-badge">🔑 Admin</span>
+      </div>
+      <button class="resources-add-btn" onclick="openResourcesModal()" title="Ajouter un lien">+</button>
+    </div>
+    <div class="resources-theme-label" id="resources-theme-label">—</div>
+    <div class="resources-list" id="resources-list">
+      <div class="resources-empty">Aucune ressource pour ce thème.</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Modal : ajout de ressource (protégé par mot de passe) -->
+<div class="resources-modal" id="resources-modal">
+  <div class="resources-modal-box">
+    <div class="resources-modal-header">
+      <h3>Ajouter une ressource</h3>
+      <p>Thème : <span id="rm-theme-display">—</span></p>
+    </div>
+    <div class="resources-modal-body">
+
+      <!-- Étape 1 : Mot de passe -->
+      <div class="rm-step active" id="rm-step-password">
+        <label class="rm-label">🔐 Mot de passe administrateur</label>
+        <input class="rm-input" id="rm-password-input" type="password"
+               placeholder="Entrez le mot de passe…"
+               onkeydown="if(event.key==='Enter') checkResourcesPassword()">
+        <div class="rm-error-msg" id="rm-password-error">❌ Mot de passe incorrect.</div>
+        <button class="rm-btn-primary" onclick="checkResourcesPassword()">Continuer →</button>
+        <button class="rm-btn-cancel" onclick="closeResourcesModal()">Annuler</button>
+      </div>
+
+      <!-- Étape 2 : Formulaire ajout -->
+      <div class="rm-step" id="rm-step-form">
+        <label class="rm-label">Titre du lien *</label>
+        <input class="rm-input" id="rm-title-input" type="text"
+               placeholder="Ex : Chronologie de la Grande Guerre"
+               maxlength="80">
+
+        <label class="rm-label">URL *</label>
+        <input class="rm-input" id="rm-url-input" type="url"
+               placeholder="https://…">
+
+        <label class="rm-label">Type de ressource</label>
+        <select class="rm-select" id="rm-type-select">
+          <option value="article">📄 Article</option>
+          <option value="video">🎥 Vidéo</option>
+          <option value="podcast">🎙️ Podcast</option>
+          <option value="site">🌐 Site web</option>
+          <option value="autre">📎 Autre</option>
+        </select>
+
+        <div class="rm-error-msg" id="rm-form-error">❌ Titre et URL requis.</div>
+        <button class="rm-btn-primary" onclick="submitResource()">✅ Ajouter la ressource</button>
+        <button class="rm-btn-cancel" onclick="closeResourcesModal()">Annuler</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
   <!-- ===== COLONNE DÉFI (droite) ===== -->
   <aside id="challenge-sidebar">
@@ -3227,6 +3634,8 @@ document.addEventListener("click", function(e) {
   }
 });
 
+
+
 /* =====================================================
    BADGES — Définitions & logique
 ===================================================== */
@@ -3397,9 +3806,201 @@ function renderBadges() {
   `;
   screen.appendChild(footer);
 }
+<script>
+
+
+<script>
+
+/* =====================================================
+   PANNEAU RESSOURCES — Configuration
+   ⚠️  Changez ce mot de passe avant de déployer !
+===================================================== */
+const RESOURCES_PASSWORD = "Sally2026";
+const RESOURCES_KEY = "quizResources";
+
+let _adminSessionActive = false;  // Session temporaire admin (jusqu'au rechargement)
+
+/* --- Persistance locale des ressources --- */
+function loadResources() {
+  try { return JSON.parse(localStorage.getItem(RESOURCES_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function saveResources(data) {
+  localStorage.setItem(RESOURCES_KEY, JSON.stringify(data));
+}
+
+/* --- Afficher / cacher le panneau selon le contexte --- */
+function showResourcesSidebar(theme) {
+  const sidebar = document.getElementById("resources-sidebar");
+  // Afficher uniquement pour les thèmes catégories (pas le mode aléatoire)
+  const isThematic = theme && !theme.startsWith("Aléatoire");
+  sidebar.style.display = isThematic ? "block" : "none";
+
+  if (isThematic) {
+    renderResourcesList(theme);
+    document.getElementById("resources-theme-label").textContent = theme.replace("Test: ", "");
+    document.getElementById("rm-theme-display").textContent = theme.replace("Test: ", "");
+    // Badge admin si session active
+    document.getElementById("admin-session-badge").classList.toggle("visible", _adminSessionActive);
+  }
+}
+
+function hideResourcesSidebar() {
+  document.getElementById("resources-sidebar").style.display = "none";
+}
+
+/* --- Rendu de la liste --- */
+function renderResourcesList(theme) {
+  const all = loadResources();
+  const list = document.getElementById("resources-list");
+  const items = (all[theme] || []);
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="resources-empty">
+      Aucune ressource pour ce thème.<br>
+      <span style="font-size:0.75rem;">Cliquez sur <strong>+</strong> pour en ajouter.</span>
+    </div>`;
+    return;
+  }
+
+  const typeIcons = { article: "📄", video: "🎥", podcast: "🎙️", site: "🌐", autre: "📎" };
+
+  list.innerHTML = items.map((item, idx) => {
+    let domain = "";
+    try { domain = new URL(item.url).hostname.replace("www.", ""); } catch {}
+    return `
+      <div class="resource-item">
+        <span class="resource-item-icon">${typeIcons[item.type] || "📎"}</span>
+        <div class="resource-item-body">
+          <a class="resource-item-title" href="${item.url}" target="_blank" rel="noopener" title="${item.title}">${item.title}</a>
+          <span class="resource-item-url">${domain}</span>
+          <span class="resource-item-type ${item.type}">${item.type}</span>
+        </div>
+        ${_adminSessionActive ? `<button class="resource-delete-btn" onclick="deleteResource('${theme}', ${idx})" title="Supprimer">✕</button>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+/* --- Suppression (admin) --- */
+function deleteResource(theme, idx) {
+  if (!confirm("Supprimer cette ressource ?")) return;
+  const all = loadResources();
+  if (all[theme]) {
+    all[theme].splice(idx, 1);
+    saveResources(all);
+    renderResourcesList(theme);
+    showToast("✅ Ressource supprimée.");
+  }
+}
+
+/* --- Modal --- */
+function openResourcesModal() {
+  const modal = document.getElementById("resources-modal");
+  modal.classList.add("active");
+
+  // Si session admin déjà active, aller directement au formulaire
+  if (_adminSessionActive) {
+    document.getElementById("rm-step-password").classList.remove("active");
+    document.getElementById("rm-step-form").classList.add("active");
+    setTimeout(() => document.getElementById("rm-title-input").focus(), 150);
+  } else {
+    document.getElementById("rm-step-password").classList.add("active");
+    document.getElementById("rm-step-form").classList.remove("active");
+    document.getElementById("rm-password-input").value = "";
+    document.getElementById("rm-password-error").classList.remove("visible");
+    setTimeout(() => document.getElementById("rm-password-input").focus(), 150);
+  }
+  document.getElementById("rm-form-error").classList.remove("visible");
+}
+
+function closeResourcesModal() {
+  document.getElementById("resources-modal").classList.remove("active");
+  document.getElementById("rm-password-input").value = "";
+  document.getElementById("rm-title-input").value = "";
+  document.getElementById("rm-url-input").value = "";
+  document.getElementById("rm-type-select").value = "article";
+}
+
+function checkResourcesPassword() {
+  const input = document.getElementById("rm-password-input");
+  const errEl = document.getElementById("rm-password-error");
+  if (input.value === RESOURCES_PASSWORD) {
+    _adminSessionActive = true;
+    input.classList.remove("error");
+    errEl.classList.remove("visible");
+    document.getElementById("admin-session-badge").classList.add("visible");
+    // Passer à l'étape formulaire
+    document.getElementById("rm-step-password").classList.remove("active");
+    document.getElementById("rm-step-form").classList.add("active");
+    setTimeout(() => document.getElementById("rm-title-input").focus(), 150);
+    // Réafficher avec boutons suppression
+    const currentTheme = gameState.currentTheme;
+    if (currentTheme) renderResourcesList(currentTheme);
+  } else {
+    input.classList.add("error");
+    errEl.classList.add("visible");
+    input.value = "";
+    input.focus();
+  }
+}
+
+function submitResource() {
+  const theme = gameState.currentTheme;
+  const title = document.getElementById("rm-title-input").value.trim();
+  const url   = document.getElementById("rm-url-input").value.trim();
+  const type  = document.getElementById("rm-type-select").value;
+  const errEl = document.getElementById("rm-form-error");
+
+  if (!title || !url) {
+    errEl.classList.add("visible");
+    return;
+  }
+
+  // Validation URL basique
+  let validUrl = url;
+  if (!url.startsWith("http://") && !url.startsWith("https://")) validUrl = "https://" + url;
+
+  errEl.classList.remove("visible");
+
+  const all = loadResources();
+  if (!all[theme]) all[theme] = [];
+  all[theme].push({ title, url: validUrl, type, addedAt: new Date().toLocaleDateString("fr-FR") });
+  saveResources(all);
+  renderResourcesList(theme);
+  closeResourcesModal();
+  showToast(`✅ Ressource ajoutée : ${title}`);
+}
+
+/* --- Fermeture modale en cliquant dehors --- */
+document.getElementById("resources-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeResourcesModal();
+});
+
+/* =====================================================
+   PATCH : showScreen() étendu pour gérer le panneau
+   Ce patch doit être ajouté APRÈS la définition de showScreen()
+   et AVANT init().
+===================================================== */
+const _origShowScreen = showScreen;
+showScreen = function(id) {
+  _origShowScreen(id);
+  // Afficher le panneau uniquement sur l'écran quiz, en mode thématique
+  if (id === "screen-quiz") {
+    showResourcesSidebar(gameState.currentTheme);
+  } else {
+    hideResourcesSidebar();
+  }
+};
+
 
 /* Lancement */
 init();
 </script>
 </body>
 </html>
+
+
+
+
