@@ -2925,7 +2925,9 @@ function renderHistory() {
 
 function clearHistory() {
   if (confirm("Effacer tout l'historique de vos scores ?")) {
-    localStorage.removeItem("quizHistory");
+    const data = loadAppData();
+    data.history = [];
+    saveAppData(data);
     renderHistory();
   }
 }
@@ -3433,7 +3435,7 @@ function renderBadges() {
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">${group.sub}</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;"></div>
     `;
     const grid = groupDiv.querySelector("div:last-child");
 
