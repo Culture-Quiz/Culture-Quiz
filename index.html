@@ -1437,11 +1437,115 @@ td, th {
   padding: 0;
 }
 
+/* ===== NAVBAR ===== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 400;
+  background: var(--card);
+  border-bottom: 2px solid var(--border);
+  box-shadow: 0 2px 16px rgba(26,26,46,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 58px;
+}
+
+.navbar-logo {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.navbar-logo span { color: var(--accent); }
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 2px solid transparent;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.nav-link:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.nav-link.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.nav-link .nav-icon { font-size: 1rem; }
+
+.nav-link .nav-badge {
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Décale le contenu pour ne pas être masqué par la navbar */
+body { padding-top: 58px; }
+
+/* Mobile : icônes seules sous 520px */
+@media (max-width: 520px) {
+  .navbar { padding: 0 12px; }
+  .nav-link .nav-label { display: none; }
+  .nav-link { padding: 8px 12px; }
+  .nav-link .nav-badge { display: none; }
+}
+
 </style>
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <span class="navbar-logo" onclick="goHome()">Quiz <span>Culture</span></span>
+  <div class="navbar-links">
+    <button class="nav-link active" id="nav-home" onclick="navTo('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Accueil</span>
+    </button>
+    <button class="nav-link" id="nav-themes" onclick="navTo('themes')">
+      <span class="nav-icon">📚</span>
+      <span class="nav-label">Thématiques</span>
+    </button>
+    <button class="nav-link" id="nav-badges" onclick="navTo('badges')">
+      <span class="nav-icon">🎖️</span>
+      <span class="nav-label">Badges</span>
+      <span class="nav-badge">Bientôt</span>
+    </button>
+  </div>
+</nav>
 
 <button id="theme-toggle" onclick="toggleDark()"
   title="Mode sombre / clair"
@@ -1709,6 +1813,64 @@ td, th {
     <button class="btn-secondary" onclick="showScreen('screen-result')">← Retour aux résultats</button>
     <button class="btn-secondary" onclick="goHome()">🏠 Accueil</button>
   </div>
+</div>
+
+<!-- THÉMATIQUES SCREEN -->
+<div id="screen-themes" class="screen" style="max-width:680px;margin:0 auto;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">📚 Thématiques</div>
+    <p style="color:var(--text-muted);">Choisissez une catégorie pour lancer un quiz dédié.</p>
+  </div>
+  <div class="categories-grid" id="themes-grid"></div>
+
+  <div style="margin-top:32px;">
+    <div class="section-title">🎯 Tests spéciaux</div>
+    <div id="themes-special-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+</div>
+
+<!-- BADGES SCREEN -->
+<div id="screen-badges" class="screen" style="max-width:680px;margin:0 auto;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">🎖️ Badges</div>
+    <p style="color:var(--text-muted);">Débloquez des badges en progressant dans vos quizs.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
+    <!-- Badge verrouillé (template × 6) -->
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Historien</span>
+      <span class="badge-desc">Terminer le quiz Histoire</span>
+    </div>
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Géographe</span>
+      <span class="badge-desc">Terminer le quiz Géographie</span>
+    </div>
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Scientifique</span>
+      <span class="badge-desc">Terminer le quiz Sciences</span>
+    </div>
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Perfectionniste</span>
+      <span class="badge-desc">Obtenir 10/10 sur un quiz</span>
+    </div>
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Challenger</span>
+      <span class="badge-desc">Atteindre 10 en Mode Défi</span>
+    </div>
+    <div class="badge-card locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-name">Légendaire</span>
+      <span class="badge-desc">Atteindre 30 en Mode Défi</span>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:28px;font-style:italic;">
+    Le système de badges arrive bientôt — restez connecté ! 🚀
+  </p>
 </div>
 
 <!-- ===== DIFFICULTY MODAL ===== -->
@@ -2798,6 +2960,75 @@ function timeOut() {
 
   showToast("⏱️ Temps écoulé !");
 }
+
+/* ===== NAVBAR ===== */
+function navTo(page) {
+  document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+  document.getElementById("nav-" + page).classList.add("active");
+
+  if (page === "home") {
+    goHome();
+  } else if (page === "themes") {
+    buildThemesScreen();
+    showScreen("screen-themes");
+    document.getElementById("sidebar").style.display = "none";
+    document.getElementById("challenge-sidebar").style.display = "none";
+  } else if (page === "badges") {
+    showScreen("screen-badges");
+    document.getElementById("sidebar").style.display = "none";
+    document.getElementById("challenge-sidebar").style.display = "none";
+  }
+}
+
+function buildThemesScreen() {
+  // Grille catégories (si vide)
+  const grid = document.getElementById("themes-grid");
+  if (grid.children.length === 0) {
+    CATEGORIES.forEach(cat => {
+      const count = QUESTIONS.filter(q => q.theme === cat.name).length;
+      const btn = document.createElement("button");
+      btn.className = "cat-btn";
+      btn.innerHTML = `
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${count} questions</span>
+      `;
+      btn.onclick = () => startCategory(cat.name);
+      grid.appendChild(btn);
+    });
+  }
+  // Tests spéciaux
+  const special = document.getElementById("themes-special-list");
+  if (special.children.length === 0) {
+    THEMED_TESTS.forEach(t => {
+      const count = QUESTIONS.filter(q => q.theme === t.name).length;
+      const item = document.createElement("button");
+      item.className = "cat-btn";
+      item.style.textAlign = "left";
+      item.style.display = "flex";
+      item.style.alignItems = "center";
+      item.style.gap = "14px";
+      item.innerHTML = `
+        <span class="cat-icon">${t.icon}</span>
+        <span>
+          <span class="cat-name">${t.label}</span>
+          <span class="cat-count">${count} questions</span>
+        </span>
+      `;
+      item.onclick = () => startCategory(t.name);
+      special.appendChild(item);
+    });
+  }
+}
+
+// Synchroniser l'onglet actif quand on revient à l'accueil
+const _origGoHome = goHome;
+goHome = function() {
+  _origGoHome();
+  document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+  const nh = document.getElementById("nav-home");
+  if (nh) nh.classList.add("active");
+};
 
 /* Lancement */
 init();
