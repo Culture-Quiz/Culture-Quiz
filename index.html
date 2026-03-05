@@ -2151,6 +2151,10 @@ body.dark .resource-item-type.site    { background: #064e3b; color: #6ee7b7; }
             🔊
           </button>
           <button class="close-btn" onclick="goHome()" title="Quitter">✕</button>
+		  <button id="share-session-btn" onclick="shareSession()" title="Défier un ami"
+  style="display:none;background:none;border:2px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:1rem;cursor:pointer;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;">
+  🔗
+</button>
         </div>
       </div>
       <div class="challenge-timer">
@@ -2726,6 +2730,7 @@ function init() {
       migrateData();
       QUESTIONS = data;
       buildUI();
+	  loadSessionFromURL();
       renderHistory();
       updateChallengeBestDisplay();
       renderLeaderboard();
@@ -2785,6 +2790,7 @@ function startCategory(theme) {
   const isThemed = THEMED_TESTS.some(t => t.name === theme);
   const selected = shuffle([...pool]).slice(0, isThemed ? 20 : 10);
   gameState = { questions: selected, currentIndex: 0, score: 0, answered: false, currentTheme: theme, isRandom: false, lastTheme: theme, lastDiff: "", mistakes: [], isRevision: false };
+  document.getElementById("share-session-btn").style.display = "flex";
   showScreen("screen-quiz");
   renderQuestion();
 }
@@ -2803,8 +2809,45 @@ function startRandom(difficulty) {
   const pool = QUESTIONS.filter(q => q.difficulty === difficulty);
   const selected = shuffle([...pool]).slice(0, 10);
   gameState = { questions: selected, currentIndex: 0, score: 0, answered: false, currentTheme: "Aléatoire — " + difficulty, isRandom: true, lastTheme: "", lastDiff: difficulty, mistakes: [], isRevision: false };
+  document.getElementById("share-session-btn").style.display = "none";
   showScreen("screen-quiz");
   renderQuestion();
+}
+
+/* =====================================================
+   DÉFI ENTRE AMIS — Partage de session
+===================================================== */
+function shareSession() {
+  // Encode les IDs des questions dans l'URL
+  const ids = gameState.questions.map(q => q.id).join(",");
+  const theme = encodeURIComponent(gameState.currentTheme);
+  const url = `${location.origin}${location.pathname}?session=${ids}&theme=${theme}`;
+  if (navigator.share) {
+    navigator.share({ title: "Quiz — Défi entre amis", text: "Peux-tu faire mieux que moi ?", url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast("🔗 Lien copié !")).catch(() => showToast("❌ Impossible de copier"));
+  }
+}
+
+function loadSessionFromURL() {
+  const params = new URLSearchParams(location.search);
+  const session = params.get("session");
+  const theme = params.get("theme");
+  if (!session || !theme) return false;
+
+  // Nettoie l'URL sans recharger
+  history.replaceState({}, "", location.pathname);
+
+  const ids = session.split(",");
+  const selected = ids.map(id => QUESTIONS.find(q => String(q.id) === id)).filter(Boolean);
+  if (selected.length === 0) return false;
+
+  const decodedTheme = decodeURIComponent(theme);
+  gameState = { questions: selected, currentIndex: 0, score: 0, answered: false, currentTheme: "🤝 Défi — " + decodedTheme, isRandom: false, lastTheme: decodedTheme, lastDiff: "", mistakes: [], isRevision: false };
+  showScreen("screen-quiz");
+  renderQuestion();
+  showToast("🤝 Session partagée chargée !");
+  return true;
 }
 
 /* =====================================================
