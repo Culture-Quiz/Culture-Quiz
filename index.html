@@ -2011,6 +2011,10 @@ body.dark .resource-item-type.site    { background: #064e3b; color: #6ee7b7; }
       <span class="nav-icon">🎖️</span>
       <span class="nav-label">Badges</span>
     </button>
+    <button class="nav-link" id="nav-stats" onclick="navTo('stats')">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Stats</span>
+    </button>
   </div>
 
   <!-- Paramètres -->
@@ -2254,6 +2258,28 @@ body.dark .resource-item-type.site    { background: #064e3b; color: #6ee7b7; }
 
     <!-- BADGES SCREEN -->
     <div id="screen-badges" class="screen"></div>
+
+    <!-- STATS SCREEN -->
+    <div id="screen-stats" class="screen">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;">📊 Mes Statistiques</div>
+        <p style="color:var(--text-muted);">Suivez votre progression par catégorie.</p>
+      </div>
+      <!-- Résumé global -->
+      <div id="stats-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;"></div>
+      <!-- Taux par catégorie -->
+      <div class="section-title">Taux de réussite par catégorie</div>
+      <div id="stats-categories" style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;"></div>
+      <!-- Courbe de progression -->
+      <div class="section-title">Courbe de progression</div>
+      <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:12px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;" id="stats-filter-btns"></div>
+        <canvas id="stats-chart" height="180" style="width:100%;display:block;"></canvas>
+        <p id="stats-chart-empty" style="text-align:center;color:var(--text-muted);font-size:0.9rem;padding:20px 0;display:none;">
+          Pas encore assez de données pour afficher une courbe.
+        </p>
+      </div>
+    </div>
 
   </main>
 
@@ -3107,7 +3133,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add("active");
 
   const isHome = id === "screen-home";
-  const isCentered = ["screen-themes", "screen-badges", "screen-revision"].includes(id);
+  const isCentered = ["screen-themes", "screen-badges", "screen-revision", "screen-stats"].includes(id);
 
   document.getElementById("sidebar").style.display = isHome ? "" : "none";
   document.getElementById("challenge-sidebar").style.display = isHome ? "" : "none";
@@ -3216,16 +3242,31 @@ function saveHistory(history) {
 }
 
 function recordResult(theme, score, total) {
-  const history = loadHistory();
-  const existing = history.find(h => h.theme === theme);
+  const data = loadAppData();
+  if (!data.history) data.history = [];
+  if (!data.allResults) data.allResults = [];
+
+  // Meilleur score par thème (pour l'affichage accueil)
+  const existing = data.history.find(h => h.theme === theme);
   if (!existing) {
-    history.push({ theme, score, total, date: new Date().toLocaleDateString("fr-FR") });
+    data.history.push({ theme, score, total, date: new Date().toLocaleDateString("fr-FR") });
   } else if (score > existing.score) {
     existing.score = score;
     existing.total = total;
     existing.date = new Date().toLocaleDateString("fr-FR");
   }
-  saveHistory(history);
+
+  // Historique complet pour la courbe de progression
+  data.allResults.push({
+    theme,
+    score,
+    total,
+    pct: Math.round((score / total) * 100),
+    ts: Date.now(),
+    date: new Date().toLocaleDateString("fr-FR")
+  });
+
+  saveAppData(data);
 }
 
 function renderHistory() {
@@ -3539,6 +3580,180 @@ function timeOut() {
 }
 
 /* ===== NAVBAR ===== */
+/* =====================================================
+   STATISTIQUES
+===================================================== */
+function buildStatsScreen() {
+  const data = loadAppData();
+  const history = data.history || [];
+  const allResults = data.allResults || [];
+
+  // --- Résumé global ---
+  const totalGames = allResults.length;
+  const avgPct = totalGames > 0 ? Math.round(allResults.reduce((s, r) => s + r.pct, 0) / totalGames) : 0;
+  const perfects = allResults.filter(r => r.pct === 100).length;
+
+  const summaryEl = document.getElementById("stats-summary");
+  summaryEl.innerHTML = [
+    { icon: "🎮", val: totalGames, label: "Parties jouées" },
+    { icon: "🎯", val: avgPct + "%", label: "Moyenne générale" },
+    { icon: "🏆", val: perfects, label: "Scores parfaits" },
+  ].map(s => `
+    <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:6px;">${s.icon}</div>
+      <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:bold;color:var(--accent);">${s.val}</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">${s.label}</div>
+    </div>
+  `).join("");
+
+  // --- Taux par catégorie ---
+  const catsEl = document.getElementById("stats-categories");
+  const allThemes = [...CATEGORIES.map(c => c.name), ...THEMED_TESTS.map(t => t.name)];
+
+  const catStats = allThemes.map(theme => {
+    const results = allResults.filter(r => r.theme === theme || r.theme === "Test: " + theme);
+    if (results.length === 0) return null;
+    const avg = Math.round(results.reduce((s, r) => s + r.pct, 0) / results.length);
+    const best = Math.max(...results.map(r => r.pct));
+    const cat = CATEGORIES.find(c => c.name === theme);
+    const icon = cat ? cat.icon : (THEMED_TESTS.find(t => t.name === theme || "Test: " + t.label === theme)?.icon || "🎯");
+    return { theme, icon, avg, best, count: results.length };
+  }).filter(Boolean).sort((a, b) => b.avg - a.avg);
+
+  if (catStats.length === 0) {
+    catsEl.innerHTML = `<p style="color:var(--text-muted);font-size:0.9rem;text-align:center;padding:12px 0;">Jouez quelques parties pour voir vos stats !</p>`;
+  } else {
+    catsEl.innerHTML = catStats.map(s => {
+      const color = s.avg >= 80 ? "var(--success)" : s.avg >= 50 ? "#B07B00" : "var(--error)";
+      return `
+        <div style="background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:14px 18px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:1.3rem;">${s.icon}</span>
+            <span style="font-weight:600;flex:1;">${s.theme.replace("Test: ","")}</span>
+            <span style="font-size:0.78rem;color:var(--text-muted);">${s.count} partie${s.count>1?"s":""}</span>
+            <span style="font-weight:700;color:${color};font-size:1rem;">${s.avg}%</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:10px;overflow:hidden;">
+            <div style="height:100%;width:${s.avg}%;background:${color};border-radius:10px;transition:width 0.6s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:0.72rem;color:var(--text-muted);">
+            <span>Moyenne</span>
+            <span>Meilleur : ${s.best}%</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // --- Courbe de progression ---
+  buildProgressionChart(allResults, "Toutes catégories");
+}
+
+function buildProgressionChart(allResults, filterTheme) {
+  const canvas = document.getElementById("stats-chart");
+  const empty = document.getElementById("stats-chart-empty");
+
+  // Filtrer
+  const results = filterTheme === "Toutes catégories"
+    ? [...allResults].sort((a, b) => a.ts - b.ts)
+    : allResults.filter(r => r.theme === filterTheme || r.theme.replace("Test: ","") === filterTheme).sort((a, b) => a.ts - b.ts);
+
+  // Boutons filtre
+  const btnsEl = document.getElementById("stats-filter-btns");
+  const themes = ["Toutes catégories", ...new Set(allResults.map(r => r.theme.replace("Test: ","")))];
+  btnsEl.innerHTML = themes.map(t => `
+    <button onclick="buildProgressionChart(loadAppData().allResults||[], '${t}')"
+      style="padding:5px 12px;border-radius:20px;border:2px solid ${t===filterTheme?'var(--accent)':'var(--border)'};
+             background:${t===filterTheme?'var(--accent-light)':'transparent'};color:${t===filterTheme?'var(--accent)':'var(--text-muted)'};
+             font-size:0.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);">
+      ${t}
+    </button>
+  `).join("");
+
+  if (results.length < 2) {
+    canvas.style.display = "none";
+    empty.style.display = "block";
+    return;
+  }
+  canvas.style.display = "block";
+  empty.style.display = "none";
+
+  const ctx = canvas.getContext("2d");
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 180 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 180;
+  ctx.clearRect(0, 0, W, H);
+
+  const pad = { top: 16, right: 16, bottom: 30, left: 36 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  // Grille
+  const isDark = document.body.classList.contains("dark");
+  const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+  const textColor = isDark ? "#9A9AB0" : "#6B6B7B";
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  [0, 25, 50, 75, 100].forEach(v => {
+    const y = pad.top + cH - (v / 100) * cH;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
+    ctx.fillStyle = textColor;
+    ctx.font = `${11 * (window.devicePixelRatio > 1 ? 1 : 1)}px sans-serif`;
+    ctx.textAlign = "right";
+    ctx.fillText(v + "%", pad.left - 5, y + 4);
+  });
+
+  // Points & ligne
+  const pts = results.map((r, i) => ({
+    x: pad.left + (i / (results.length - 1)) * cW,
+    y: pad.top + cH - (r.pct / 100) * cH,
+    r, i
+  }));
+
+  // Zone remplie
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.top + cH);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length - 1].x, pad.top + cH);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
+  grad.addColorStop(0, "rgba(232,93,38,0.18)");
+  grad.addColorStop(1, "rgba(232,93,38,0)");
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Ligne
+  ctx.beginPath();
+  ctx.strokeStyle = "var(--accent)";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Points
+  pts.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = p.r.pct === 100 ? "var(--success)" : "var(--accent)";
+    ctx.fill();
+    ctx.strokeStyle = isDark ? "#252540" : "#fff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Dates axe X
+  ctx.fillStyle = textColor;
+  ctx.textAlign = "center";
+  ctx.font = "10px sans-serif";
+  const step = Math.max(1, Math.floor(results.length / 5));
+  pts.forEach((p, i) => {
+    if (i % step === 0 || i === pts.length - 1) {
+      ctx.fillText(p.r.date, p.x, H - 6);
+    }
+  });
+}
+
 function navTo(page) {
   document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
   document.getElementById("nav-" + page).classList.add("active");
@@ -3551,6 +3766,9 @@ function navTo(page) {
   } else if (page === "badges") {
     renderBadges();
     showScreen("screen-badges");
+  } else if (page === "stats") {
+    buildStatsScreen();
+    showScreen("screen-stats");
   }
 }
 
