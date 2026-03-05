@@ -1980,9 +1980,13 @@ body.dark .resource-item-type.site    { background: #064e3b; color: #6ee7b7; }
 }
 .admin-session-badge.visible { display: flex; }
 
-/* Responsive */
+/* Responsive — ressources sous le quiz sur mobile */
 @media (max-width: 1100px) {
-  #resources-sidebar { display: none !important; }
+  #resources-sidebar {
+    width: 100% !important;
+    position: static !important;
+    margin-top: 20px;
+  }
 }
 
 </style>
