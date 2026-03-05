@@ -3812,18 +3812,23 @@ function renderBadges() {
    ⚠️  Changez ce mot de passe avant de déployer !
 ===================================================== */
 const RESOURCES_PASSWORD = "Sally2026";
-const RESOURCES_KEY = "quizResources";
 
 let _adminSessionActive = false;  // Session temporaire admin (jusqu'au rechargement)
 
-/* --- Persistance locale des ressources --- */
-function loadResources() {
-  try { return JSON.parse(localStorage.getItem(RESOURCES_KEY)) || {}; }
-  catch { return {}; }
-}
-
-function saveResources(data) {
-  localStorage.setItem(RESOURCES_KEY, JSON.stringify(data));
+/* --- Persistance Supabase des ressources --- */
+async function loadResources(theme) {
+  try {
+    const { data, error } = await sb
+      .from("resources")
+      .select("id, title, url, type, added_at")
+      .eq("theme", theme)
+      .order("id", { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn("loadResources error:", e.message);
+    return [];
+  }
 }
 
 /* --- Afficher / cacher le panneau selon le contexte --- */
@@ -3847,10 +3852,11 @@ function hideResourcesSidebar() {
 }
 
 /* --- Rendu de la liste --- */
-function renderResourcesList(theme) {
-  const all = loadResources();
+async function renderResourcesList(theme) {
   const list = document.getElementById("resources-list");
-  const items = (all[theme] || []);
+  list.innerHTML = `<div class="resources-empty">⏳ Chargement…</div>`;
+
+  const items = await loadResources(theme);
 
   if (items.length === 0) {
     list.innerHTML = `<div class="resources-empty">
@@ -3862,7 +3868,7 @@ function renderResourcesList(theme) {
 
   const typeIcons = { article: "📄", video: "🎥", podcast: "🎙️", site: "🌐", autre: "📎" };
 
-  list.innerHTML = items.map((item, idx) => {
+  list.innerHTML = items.map((item) => {
     let domain = "";
     try { domain = new URL(item.url).hostname.replace("www.", ""); } catch {}
     return `
@@ -3873,21 +3879,23 @@ function renderResourcesList(theme) {
           <span class="resource-item-url">${domain}</span>
           <span class="resource-item-type ${item.type}">${item.type}</span>
         </div>
-        ${_adminSessionActive ? `<button class="resource-delete-btn" onclick="deleteResource('${theme}', ${idx})" title="Supprimer">✕</button>` : ""}
+        ${_adminSessionActive ? `<button class="resource-delete-btn" onclick="deleteResource('${theme}', ${item.id})" title="Supprimer">✕</button>` : ""}
       </div>
     `;
   }).join("");
 }
 
 /* --- Suppression (admin) --- */
-function deleteResource(theme, idx) {
+async function deleteResource(theme, id) {
   if (!confirm("Supprimer cette ressource ?")) return;
-  const all = loadResources();
-  if (all[theme]) {
-    all[theme].splice(idx, 1);
-    saveResources(all);
+  try {
+    const { error } = await sb.from("resources").delete().eq("id", id);
+    if (error) throw error;
     renderResourcesList(theme);
     showToast("✅ Ressource supprimée.");
+  } catch (e) {
+    showToast("❌ Erreur lors de la suppression.");
+    console.error(e);
   }
 }
 
@@ -3942,7 +3950,7 @@ function checkResourcesPassword() {
   }
 }
 
-function submitResource() {
+async function submitResource() {
   const theme = gameState.currentTheme;
   const title = document.getElementById("rm-title-input").value.trim();
   const url   = document.getElementById("rm-url-input").value.trim();
@@ -3960,13 +3968,22 @@ function submitResource() {
 
   errEl.classList.remove("visible");
 
-  const all = loadResources();
-  if (!all[theme]) all[theme] = [];
-  all[theme].push({ title, url: validUrl, type, addedAt: new Date().toLocaleDateString("fr-FR") });
-  saveResources(all);
-  renderResourcesList(theme);
-  closeResourcesModal();
-  showToast(`✅ Ressource ajoutée : ${title}`);
+  try {
+    const { error } = await sb.from("resources").insert([{
+      theme,
+      title,
+      url: validUrl,
+      type,
+      added_at: new Date().toLocaleDateString("fr-FR")
+    }]);
+    if (error) throw error;
+    await renderResourcesList(theme);
+    closeResourcesModal();
+    showToast(`✅ Ressource ajoutée : ${title}`);
+  } catch (e) {
+    showToast("❌ Erreur lors de l'ajout.");
+    console.error(e);
+  }
 }
 
 /* --- Fermeture modale en cliquant dehors --- */
@@ -3996,7 +4013,3 @@ init();
 </script>
 </body>
 </html>
-
-
-
-
